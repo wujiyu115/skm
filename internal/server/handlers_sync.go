@@ -77,7 +77,10 @@ func (s *Server) triggerSync(c *fiber.Ctx) error {
 				results = append(results, result{sk.Name, ag.Name, "error"})
 				continue
 			}
-			s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", sk.ContentHash)
+			if err := s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", sk.ContentHash); err != nil {
+				results = append(results, result{sk.Name, ag.Name, "error"})
+				continue
+			}
 			results = append(results, result{sk.Name, ag.Name, "synced"})
 		}
 	}

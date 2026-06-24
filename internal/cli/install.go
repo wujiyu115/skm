@@ -134,7 +134,10 @@ func runInstall(cfg *Config, source string, global bool, agentNames []string, ye
 				continue
 			}
 
-			cfg.Store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", hash)
+			if err := cfg.Store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", hash); err != nil {
+				color.Red("  ✗ %s → %s: failed to save target: %v", sk.Name, ag.DisplayName, err)
+				continue
+			}
 			green.Printf("  ✓ %s → %s (%s)\n", sk.Name, ag.DisplayName, targetPath)
 		}
 	}

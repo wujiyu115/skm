@@ -242,7 +242,10 @@ func newGroupInstallCmd() *cobra.Command {
 						color.Red("  ✗ %s → %s: %v", sk.Name, ag.DisplayName, err)
 						continue
 					}
-					cfg.Store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", sk.ContentHash)
+					if err := cfg.Store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", sk.ContentHash); err != nil {
+						color.Red("  ✗ %s → %s: failed to save target: %v", sk.Name, ag.DisplayName, err)
+						continue
+					}
 					color.Green("  ✓ %s → %s", sk.Name, ag.DisplayName)
 				}
 			}
