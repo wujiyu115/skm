@@ -1,8 +1,27 @@
+# Binary
 /skm
+
+# SQLite
 *.db
 *.db-wal
 *.db-shm
+
+# Web frontend
 web/node_modules/
 web/dist/
 web/*.tsbuildinfo
+
+# Embedded dist (built via make)
 internal/server/dist/assets/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test/coverage
+coverage.out
+*.coverprofile
