@@ -29,6 +29,7 @@ func newServeCmd() *cobra.Command {
 				Store:     cfg.Store,
 				SkillsDir: cfg.SkillsDir,
 				CacheDir:  cfg.CacheDir,
+				DevMode:   server.IsDevMode(),
 			})
 
 			if openBrowser {
