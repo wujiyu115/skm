@@ -17,6 +17,7 @@ func NewRoot() *cobra.Command {
 		newShowCmd(),
 		newRemoveCmd(),
 		newSyncCmd(),
+		newGroupCmd(),
 	)
 
 	return root
