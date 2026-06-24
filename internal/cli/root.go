@@ -20,6 +20,7 @@ func NewRoot() *cobra.Command {
 		newGroupCmd(),
 		newUpdateCmd(),
 		newAgentCmd(),
+		newServeCmd(),
 	)
 
 	return root
