@@ -9,6 +9,7 @@ import (
 
 func newListCmd() *cobra.Command {
 	var agentFilter string
+	var jsonOutput bool
 
 	cmd := &cobra.Command{
 		Use:   "list",
@@ -23,6 +24,10 @@ func newListCmd() *cobra.Command {
 			skills, err := cfg.Store.ListSkills()
 			if err != nil {
 				return err
+			}
+
+			if jsonOutput {
+				return printJSON(skills)
 			}
 
 			if len(skills) == 0 {
@@ -64,5 +69,6 @@ func newListCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&agentFilter, "agent", "a", "", "Filter by agent")
+	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Output as JSON")
 	return cmd
 }

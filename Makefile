@@ -1,7 +1,12 @@
-.PHONY: build test clean dev web
+.PHONY: build test clean dev web install
+
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 
 build: web
-	go build -o skm ./cmd/skm
+	go build -ldflags "-X github.com/ejoy/skm/internal/cli.Version=$(VERSION)" -o skm ./cmd/skm
+
+install: web
+	go install -ldflags "-X github.com/ejoy/skm/internal/cli.Version=$(VERSION)" ./cmd/skm
 
 web:
 	cd web && npm ci && npm run build

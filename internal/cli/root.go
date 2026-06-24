@@ -1,6 +1,9 @@
 package cli
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +24,17 @@ func NewRoot() *cobra.Command {
 		newUpdateCmd(),
 		newAgentCmd(),
 		newServeCmd(),
+		newVersionCmd(),
 	)
 
 	return root
+}
+
+func printJSON(v interface{}) error {
+	data, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(data))
+	return nil
 }

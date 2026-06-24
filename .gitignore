@@ -4,4 +4,5 @@
 *.db-shm
 web/node_modules/
 web/dist/
+web/*.tsbuildinfo
 internal/server/dist/assets/
