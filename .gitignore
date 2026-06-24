@@ -1,0 +1,4 @@
+/skm
+*.db
+*.db-wal
+*.db-shm
