@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -52,6 +53,7 @@ func (s *Server) createGroup(c *fiber.Ctx) error {
 	if err := s.store.InsertGroup(id, req.Name, req.Description); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
+	s.writeMetadata()
 	return c.Status(201).JSON(fiber.Map{"id": id, "name": req.Name})
 }
 
@@ -75,6 +77,7 @@ func (s *Server) updateGroup(c *fiber.Ctx) error {
 	if err := s.store.UpdateGroup(c.Params("id"), req.Name, req.Description); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
+	s.writeMetadata()
 	return c.JSON(fiber.Map{"ok": true})
 }
 
@@ -82,6 +85,7 @@ func (s *Server) deleteGroup(c *fiber.Ctx) error {
 	if err := s.store.DeleteGroup(c.Params("id")); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
+	s.writeMetadata()
 	return c.JSON(fiber.Map{"ok": true})
 }
 
@@ -93,13 +97,19 @@ func (s *Server) addGroupSkills(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid request"})
 	}
 	for i, sid := range req.SkillIDs {
-		s.store.AddSkillToGroup(c.Params("id"), sid, i)
+		if err := s.store.AddSkillToGroup(c.Params("id"), sid, i); err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("add skill to group: %v", err)})
+		}
 	}
+	s.writeMetadata()
 	return c.JSON(fiber.Map{"ok": true})
 }
 
 func (s *Server) removeGroupSkill(c *fiber.Ctx) error {
-	s.store.RemoveSkillFromGroup(c.Params("id"), c.Params("sid"))
+	if err := s.store.RemoveSkillFromGroup(c.Params("id"), c.Params("sid")); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("remove skill from group: %v", err)})
+	}
+	s.writeMetadata()
 	return c.JSON(fiber.Map{"ok": true})
 }
 
@@ -115,15 +125,22 @@ func (s *Server) installGroup(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	targetAgents := resolveAgentsForAPI(req.Agents)
+	targetAgents := agent.Resolve(req.Agents)
 	cwd, _ := os.Getwd()
 
 	for _, sk := range skills {
 		for _, ag := range targetAgents {
-			targetDir := agent.InstallPath(ag, req.Global, cwd)
+			targetDir, err := agent.InstallPath(ag, req.Global, cwd)
+			if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("install path: %v", err)})
+			}
 			targetPath := filepath.Join(targetDir, sk.Name)
-			skmsync.SyncSkill(sk.CentralPath, targetPath, "symlink")
-			s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", sk.ContentHash)
+			if err := skmsync.SyncSkill(sk.CentralPath, targetPath, "symlink"); err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("sync %s: %v", sk.Name, err)})
+			}
+			if err := s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", sk.ContentHash); err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("upsert target: %v", err)})
+			}
 		}
 	}
 	return c.JSON(fiber.Map{"ok": true})

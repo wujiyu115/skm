@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -63,8 +64,11 @@ func (s *Server) deleteSkill(c *fiber.Ctx) error {
 		skmsync.Unsync(t.TargetPath)
 	}
 	os.RemoveAll(sk.CentralPath)
-	s.store.DeleteSkill(sk.ID)
+	if err := s.store.DeleteSkill(sk.ID); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
 
+	s.writeMetadata()
 	return c.JSON(fiber.Map{"ok": true})
 }
 
@@ -101,7 +105,7 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "no skills found"})
 	}
 
-	targetAgents := resolveAgentsForAPI(req.Agents)
+	targetAgents := agent.Resolve(req.Agents)
 	cwd, _ := os.Getwd()
 	var installed []string
 
@@ -121,18 +125,29 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 			sk.SourceRef = req.Source
 		}
 
+		// DeleteSkillByName may return "not found" on first install — ignore that.
 		s.store.DeleteSkillByName(sk.Name)
-		s.store.InsertSkill(sk)
+		if err := s.store.InsertSkill(sk); err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("save skill %s: %v", sk.Name, err)})
+		}
 
 		for _, ag := range targetAgents {
-			targetDir := agent.InstallPath(ag, req.Global, cwd)
+			targetDir, err := agent.InstallPath(ag, req.Global, cwd)
+			if err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("install path: %v", err)})
+			}
 			targetPath := filepath.Join(targetDir, sk.Name)
-			skmsync.SyncSkill(centralPath, targetPath, "symlink")
-			s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", hash)
+			if err := skmsync.SyncSkill(centralPath, targetPath, "symlink"); err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("sync %s: %v", sk.Name, err)})
+			}
+			if err := s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", hash); err != nil {
+				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("upsert target: %v", err)})
+			}
 		}
 		installed = append(installed, sk.Name)
 	}
 
+	s.writeMetadata()
 	return c.JSON(fiber.Map{"installed": installed})
 }
 
@@ -161,35 +176,23 @@ func (s *Server) syncSkill(c *fiber.Ctx) error {
 	}
 	c.BodyParser(&req)
 
-	targetAgents := resolveAgentsForAPI(req.Agents)
+	targetAgents := agent.Resolve(req.Agents)
 	cwd, _ := os.Getwd()
 
 	for _, ag := range targetAgents {
-		targetDir := agent.InstallPath(ag, req.Global, cwd)
+		targetDir, err := agent.InstallPath(ag, req.Global, cwd)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("install path: %v", err)})
+		}
 		targetPath := filepath.Join(targetDir, sk.Name)
-		skmsync.SyncSkill(sk.CentralPath, targetPath, "symlink")
-		s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", sk.ContentHash)
+		if err := skmsync.SyncSkill(sk.CentralPath, targetPath, "symlink"); err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("sync %s: %v", sk.Name, err)})
+		}
+		if err := s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", sk.ContentHash); err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("upsert target: %v", err)})
+		}
 	}
 
 	return c.JSON(fiber.Map{"ok": true})
 }
 
-func resolveAgentsForAPI(names []string) []agent.Adapter {
-	if len(names) > 0 {
-		var result []agent.Adapter
-		for _, n := range names {
-			if a, ok := agent.Find(n); ok {
-				result = append(result, a)
-			}
-		}
-		return result
-	}
-	detected := agent.Detect()
-	if len(detected) > 0 {
-		return detected
-	}
-	if a, ok := agent.Find("claude"); ok {
-		return []agent.Adapter{a}
-	}
-	return nil
-}

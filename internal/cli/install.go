@@ -82,7 +82,7 @@ func runInstall(cfg *Config, source string, global bool, agentNames []string, ye
 		return nil
 	}
 
-	targetAgents := resolveAgents(agentNames)
+	targetAgents := agent.Resolve(agentNames)
 	if len(targetAgents) == 0 {
 		return fmt.Errorf("no agents specified or detected. Use -a <agent> or install an agent first")
 	}
@@ -122,7 +122,11 @@ func runInstall(cfg *Config, source string, global bool, agentNames []string, ye
 		}
 
 		for _, ag := range targetAgents {
-			targetDir := agent.InstallPath(ag, global, cwd)
+			targetDir, err := agent.InstallPath(ag, global, cwd)
+			if err != nil {
+				color.Red("  ✗ %s → %s: %v", sk.Name, ag.DisplayName, err)
+				continue
+			}
 			targetPath := filepath.Join(targetDir, sk.Name)
 
 			if err := skmsync.SyncSkill(centralPath, targetPath, "symlink"); err != nil {
@@ -135,27 +139,7 @@ func runInstall(cfg *Config, source string, global bool, agentNames []string, ye
 		}
 	}
 
+	cfg.WriteMetadata()
 	return nil
 }
 
-func resolveAgents(names []string) []agent.Adapter {
-	if len(names) > 0 {
-		var result []agent.Adapter
-		for _, n := range names {
-			if a, ok := agent.Find(n); ok {
-				result = append(result, a)
-			}
-		}
-		return result
-	}
-
-	detected := agent.Detect()
-	if len(detected) > 0 {
-		return detected
-	}
-
-	if a, ok := agent.Find("claude"); ok {
-		return []agent.Adapter{a}
-	}
-	return nil
-}

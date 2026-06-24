@@ -43,7 +43,7 @@ func (s *Server) triggerSync(c *fiber.Ctx) error {
 	c.BodyParser(&req)
 
 	skills, _ := s.store.ListSkills()
-	targetAgents := resolveAgentsForAPI(req.Agents)
+	targetAgents := agent.Resolve(req.Agents)
 	cwd, _ := os.Getwd()
 
 	type result struct {
@@ -58,7 +58,11 @@ func (s *Server) triggerSync(c *fiber.Ctx) error {
 			continue
 		}
 		for _, ag := range targetAgents {
-			targetDir := agent.InstallPath(ag, req.Global, cwd)
+			targetDir, err := agent.InstallPath(ag, req.Global, cwd)
+			if err != nil {
+				results = append(results, result{sk.Name, ag.Name, "error"})
+				continue
+			}
 			targetPath := filepath.Join(targetDir, sk.Name)
 
 			if skmsync.IsCurrent(sk.CentralPath, targetPath, "symlink") {

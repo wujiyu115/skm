@@ -24,11 +24,13 @@ func newServeCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			defer cfg.Close()
 
 			srv := server.New(&server.ServerConfig{
 				Store:     cfg.Store,
 				SkillsDir: cfg.SkillsDir,
 				CacheDir:  cfg.CacheDir,
+				MetaDir:   cfg.MetaDir,
 				DevMode:   server.IsDevMode(),
 			})
 

@@ -96,6 +96,7 @@ func newUpdateCmd() *cobra.Command {
 				color.Green("  ✓ %s updated", sk.Name)
 			}
 
+			cfg.WriteMetadata()
 			return nil
 		},
 	}

@@ -45,7 +45,10 @@ func TestFind_NonExistentAgent(t *testing.T) {
 
 func TestInstallPath_Global(t *testing.T) {
 	a, _ := Find("claude")
-	p := InstallPath(a, true, "/some/project")
+	p, err := InstallPath(a, true, "/some/project")
+	if err != nil {
+		t.Fatalf("InstallPath() error: %v", err)
+	}
 	home, _ := os.UserHomeDir()
 	want := filepath.Join(home, ".claude", "skills")
 	if p != want {
@@ -55,7 +58,10 @@ func TestInstallPath_Global(t *testing.T) {
 
 func TestInstallPath_Project(t *testing.T) {
 	a, _ := Find("claude")
-	p := InstallPath(a, false, "/some/project")
+	p, err := InstallPath(a, false, "/some/project")
+	if err != nil {
+		t.Fatalf("InstallPath() error: %v", err)
+	}
 	want := filepath.Join("/some/project", ".claude", "skills")
 	if p != want {
 		t.Errorf("project path = %q, want %q", p, want)

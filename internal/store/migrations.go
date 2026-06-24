@@ -73,7 +73,6 @@ func (s *Store) migrateV1() error {
 			key   TEXT PRIMARY KEY,
 			value TEXT
 		)`,
-		`PRAGMA user_version = 1`,
 	}
 
 	for _, stmt := range stmts {
@@ -82,5 +81,14 @@ func (s *Store) migrateV1() error {
 		}
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("migration v1 commit: %w", err)
+	}
+
+	// PRAGMA is not transactional in SQLite; execute after commit.
+	if _, err := s.db.Exec("PRAGMA user_version = 1"); err != nil {
+		return fmt.Errorf("set user_version: %w", err)
+	}
+
+	return nil
 }

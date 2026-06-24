@@ -50,6 +50,7 @@ func newGroupCreateCmd() *cobra.Command {
 			if err := cfg.Store.InsertGroup(id, args[0], desc); err != nil {
 				return fmt.Errorf("create group: %w", err)
 			}
+			cfg.WriteMetadata()
 			color.Green("✓ Created group %q", args[0])
 			return nil
 		},
@@ -151,6 +152,7 @@ func newGroupAddCmd() *cobra.Command {
 				}
 				color.Green("  ✓ Added %s to %s", name, g.Name)
 			}
+			cfg.WriteMetadata()
 			return nil
 		},
 	}
@@ -179,6 +181,7 @@ func newGroupRemoveCmd() *cobra.Command {
 			if err := cfg.Store.RemoveSkillFromGroup(g.ID, sk.ID); err != nil {
 				return err
 			}
+			cfg.WriteMetadata()
 			color.Green("✓ Removed %s from %s", sk.Name, g.Name)
 			return nil
 		},
@@ -215,7 +218,7 @@ func newGroupInstallCmd() *cobra.Command {
 				return fmt.Errorf("group %q has no skills", g.Name)
 			}
 
-			targetAgents := resolveAgents(agentNames)
+			targetAgents := agent.Resolve(agentNames)
 			if len(targetAgents) == 0 {
 				return fmt.Errorf("no agents specified or detected")
 			}
@@ -224,7 +227,11 @@ func newGroupInstallCmd() *cobra.Command {
 
 			for _, sk := range skills {
 				for _, ag := range targetAgents {
-					targetDir := agent.InstallPath(ag, global, cwd)
+					targetDir, err := agent.InstallPath(ag, global, cwd)
+					if err != nil {
+						color.Red("  ✗ %s → %s: %v", sk.Name, ag.DisplayName, err)
+						continue
+					}
 					targetPath := filepath.Join(targetDir, sk.Name)
 
 					if skmsync.IsCurrent(sk.CentralPath, targetPath, "symlink") {
@@ -280,6 +287,7 @@ func newGroupDeleteCmd() *cobra.Command {
 			if err := cfg.Store.DeleteGroup(g.ID); err != nil {
 				return err
 			}
+			cfg.WriteMetadata()
 			color.Green("✓ Deleted group %q", g.Name)
 			return nil
 		},

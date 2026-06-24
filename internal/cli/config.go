@@ -14,6 +14,7 @@ type Config struct {
 	DBPath    string
 	SkillsDir string
 	CacheDir  string
+	MetaDir   string
 	Store     *store.Store
 }
 
@@ -29,6 +30,7 @@ func NewConfig() (*Config, error) {
 		DBPath:    filepath.Join(skmDir, "skm.db"),
 		SkillsDir: filepath.Join(skmDir, "skills"),
 		CacheDir:  filepath.Join(skmDir, "cache"),
+		MetaDir:   filepath.Join(skmDir, "metadata"),
 	}
 
 	os.MkdirAll(cfg.SkillsDir, 0755)
@@ -48,5 +50,13 @@ func NewConfig() (*Config, error) {
 func (c *Config) Close() {
 	if c.Store != nil {
 		c.Store.Close()
+	}
+}
+
+// WriteMetadata writes JSON metadata mirror files. Errors are logged but
+// not treated as fatal since metadata is a convenience mirror of the DB.
+func (c *Config) WriteMetadata() {
+	if err := c.Store.WriteMetadata(c.MetaDir); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: write metadata: %v\n", err)
 	}
 }

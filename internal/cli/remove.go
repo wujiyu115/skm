@@ -52,6 +52,7 @@ func newRemoveCmd() *cobra.Command {
 				return err
 			}
 
+			cfg.WriteMetadata()
 			color.Green("✓ Removed %s", sk.Name)
 			return nil
 		},

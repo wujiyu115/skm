@@ -34,7 +34,7 @@ func newSyncCmd() *cobra.Command {
 				return err
 			}
 
-			targetAgents := resolveAgents(agentNames)
+			targetAgents := agent.Resolve(agentNames)
 			if len(targetAgents) == 0 {
 				return fmt.Errorf("no agents specified or detected")
 			}
@@ -47,7 +47,11 @@ func newSyncCmd() *cobra.Command {
 					continue
 				}
 				for _, ag := range targetAgents {
-					targetDir := agent.InstallPath(ag, global, cwd)
+					targetDir, err := agent.InstallPath(ag, global, cwd)
+					if err != nil {
+						color.Red("  ✗ %s → %s: %v", sk.Name, ag.DisplayName, err)
+						continue
+					}
 					targetPath := filepath.Join(targetDir, sk.Name)
 
 					if skmsync.IsCurrent(sk.CentralPath, targetPath, "symlink") {

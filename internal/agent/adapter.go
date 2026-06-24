@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -62,10 +63,13 @@ func Find(name string) (Adapter, bool) {
 // InstallPath returns the filesystem path where skills should be installed
 // for the given adapter. If global is true, the path is under the user's
 // home directory; otherwise it is relative to cwd.
-func InstallPath(a Adapter, global bool, cwd string) string {
+func InstallPath(a Adapter, global bool, cwd string) (string, error) {
 	if global {
-		home, _ := os.UserHomeDir()
-		return filepath.Join(home, a.GlobalDir)
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("get home dir: %w", err)
+		}
+		return filepath.Join(home, a.GlobalDir), nil
 	}
-	return filepath.Join(cwd, a.ProjectDir)
+	return filepath.Join(cwd, a.ProjectDir), nil
 }

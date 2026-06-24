@@ -26,6 +26,7 @@ type ServerConfig struct {
 	Store     *store.Store
 	SkillsDir string
 	CacheDir  string
+	MetaDir   string
 	DevMode   bool
 }
 
@@ -35,7 +36,9 @@ func New(cfg *ServerConfig) *Server {
 		DisableStartupMessage: true,
 	})
 
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:3721, http://localhost:5173",
+	}))
 
 	s := &Server{
 		app:   app,
@@ -81,6 +84,17 @@ func (s *Server) Start(port int) error {
 // App returns the underlying Fiber app (useful for testing).
 func (s *Server) App() *fiber.App {
 	return s.app
+}
+
+// writeMetadata writes JSON metadata mirror files. Errors are logged
+// to stderr but do not fail the request.
+func (s *Server) writeMetadata() {
+	if s.cfg.MetaDir == "" {
+		return
+	}
+	if err := s.store.WriteMetadata(s.cfg.MetaDir); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: write metadata: %v\n", err)
+	}
 }
 
 // IsDevMode returns true when SKM_DEV env var is set to "1" or "true".

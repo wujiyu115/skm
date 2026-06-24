@@ -53,9 +53,9 @@ func copyFile(src, dst string) error {
 	if err != nil {
 		return fmt.Errorf("create dest: %w", err)
 	}
-	defer out.Close()
 
 	if _, err := io.Copy(out, in); err != nil {
+		out.Close()
 		return fmt.Errorf("copy: %w", err)
 	}
 	return out.Close()
