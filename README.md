@@ -1,5 +1,7 @@
 # SKM — AI Agent Skills Manager
 
+[中文文档](README_CN.md)
+
 A unified skills management tool for AI coding agents. Single Go binary provides both CLI and web UI.
 
 ## Features

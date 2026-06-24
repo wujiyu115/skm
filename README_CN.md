@@ -1,5 +1,7 @@
 # SKM — AI 智能体技能管理器
 
+[English](README.md)
+
 统一的 AI 编程智能体技能管理工具。单个 Go 二进制文件同时提供 CLI 和 Web UI。
 
 ## 功能特性
