@@ -23,7 +23,18 @@ const maxRecurseDepth = 5
 func Discover(baseDir string, subpath string) ([]*Skill, error) {
 	searchDir := baseDir
 	if subpath != "" {
-		searchDir = filepath.Join(baseDir, subpath)
+		candidate := filepath.Join(baseDir, subpath)
+		if info, err := os.Stat(candidate); err == nil && info.IsDir() {
+			searchDir = candidate
+		} else {
+			for _, pd := range priorityDirs {
+				alt := filepath.Join(baseDir, pd, subpath)
+				if info, err := os.Stat(alt); err == nil && info.IsDir() {
+					searchDir = alt
+					break
+				}
+			}
+		}
 	}
 
 	// If the search dir itself is a skill, return it directly.
