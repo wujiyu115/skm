@@ -107,6 +107,28 @@ export const api = {
         body: JSON.stringify({ agents }),
       }),
   },
+  batch: {
+    delete: (ids: string[]) =>
+      request<{ ok: boolean; processed: number; errors: string[] }>('/skills/batch/delete', {
+        method: 'POST',
+        body: JSON.stringify({ ids }),
+      }),
+    enable: (ids: string[], enabled: boolean) =>
+      request<{ ok: boolean; processed: number; errors: string[] }>('/skills/batch/enable', {
+        method: 'POST',
+        body: JSON.stringify({ ids, enabled }),
+      }),
+    tag: (ids: string[], tags: string[], action: 'add' | 'remove') =>
+      request<{ ok: boolean; processed: number; errors: string[] }>('/skills/batch/tag', {
+        method: 'POST',
+        body: JSON.stringify({ ids, tags, action }),
+      }),
+    sync: (ids: string[], agents: string[]) =>
+      request<{ ok: boolean; processed: number; errors: string[] }>('/skills/batch/sync', {
+        method: 'POST',
+        body: JSON.stringify({ ids, agents }),
+      }),
+  },
   tags: {
     list: () => request<string[]>('/tags').then(r => r ?? []),
     getForSkill: (skillId: string) => request<string[]>(`/skills/${skillId}/tags`).then(r => r ?? []),

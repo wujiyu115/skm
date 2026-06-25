@@ -6,6 +6,7 @@ import { toast } from '../lib/toast'
 import SkillCard from '../components/SkillCard'
 import TagFilter from '../components/TagFilter'
 import SkillDetailPanel from '../components/SkillDetailPanel'
+import BatchToolbar from '../components/BatchToolbar'
 
 type Tab = 'all' | 'enabled' | 'available'
 
@@ -117,6 +118,34 @@ export default function SkillsLibrary() {
     try {
       await api.skills.setEnabled(id, enabled)
       toast.success(t(enabled ? 'toast.skillEnabled' : 'toast.skillDisabled'))
+      load()
+    } catch {
+      toast.error(t('toast.error'))
+    }
+  }
+
+  const handleBatchAction = async (action: string) => {
+    const ids = Array.from(selectedSkills)
+    try {
+      switch (action) {
+        case 'delete':
+          await api.batch.delete(ids)
+          toast.success(t('toast.batchDone'))
+          break
+        case 'enable':
+          await api.batch.enable(ids, true)
+          toast.success(t('toast.batchDone'))
+          break
+        case 'disable':
+          await api.batch.enable(ids, false)
+          toast.success(t('toast.batchDone'))
+          break
+        case 'sync':
+          await api.batch.sync(ids, [])
+          toast.success(t('toast.batchDone'))
+          break
+      }
+      setSelectedSkills(new Set())
       load()
     } catch {
       toast.error(t('toast.error'))
@@ -248,6 +277,12 @@ export default function SkillsLibrary() {
       <SkillDetailPanel
         skillId={selectedSkillId}
         onClose={() => setSelectedSkillId(null)}
+      />
+
+      <BatchToolbar
+        selectedIds={Array.from(selectedSkills)}
+        onClear={() => setSelectedSkills(new Set())}
+        onAction={handleBatchAction}
       />
     </div>
   )

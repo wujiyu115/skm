@@ -156,6 +156,7 @@ const translations = {
     'toast.synced': 'Sync complete',
     'toast.deleted': 'Deleted successfully',
     'toast.copied': 'Copied to clipboard',
+    'toast.batchDone': 'Batch operation completed',
 
     // Batch
     'batch.selected': 'selected',
@@ -331,6 +332,7 @@ const translations = {
     'toast.synced': '同步完成',
     'toast.deleted': '删除成功',
     'toast.copied': '已复制到剪贴板',
+    'toast.batchDone': '批量操作完成',
 
     // Batch
     'batch.selected': '已选中',
