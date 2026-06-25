@@ -26,6 +26,7 @@ func NewRoot() *cobra.Command {
 		newTagCmd(),
 		newUpdateCmd(),
 		newAgentCmd(),
+		newConfigCmd(),
 		newServeCmd(),
 		newVersionCmd(),
 	)
