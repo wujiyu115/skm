@@ -8,6 +8,7 @@ import Groups from './pages/Groups'
 import AgentWorkspace from './pages/AgentWorkspace'
 import Settings from './pages/Settings'
 import AuditLog from './pages/AuditLog'
+import ProjectWorkspace from './pages/ProjectWorkspace'
 
 export default function App() {
   return (
@@ -21,6 +22,8 @@ export default function App() {
           <Route path="/install" element={<Install />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/groups/:id" element={<Groups />} />
+          <Route path="/projects" element={<ProjectWorkspace />} />
+          <Route path="/projects/:id" element={<ProjectWorkspace />} />
           <Route path="/agents" element={<AgentWorkspace />} />
           <Route path="/agents/:name" element={<AgentWorkspace />} />
           <Route path="/audit" element={<AuditLog />} />

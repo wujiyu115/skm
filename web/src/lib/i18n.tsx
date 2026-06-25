@@ -178,6 +178,35 @@ const translations = {
 
     // Nav additions
     'nav.audit': 'Audit Log',
+    'nav.projects': 'Project Workspace',
+    'nav.addProject': '+ Add Project',
+
+    // Projects
+    'projects.title': 'Project Workspace',
+    'projects.addProject': 'Add Project',
+    'projects.path': 'Project Path',
+    'projects.pathPlaceholder': '/absolute/path/to/project',
+    'projects.noProjects': 'No projects registered',
+    'projects.noProjectsHint': 'Add a project directory to manage its skills',
+    'projects.back': 'Back to Projects',
+    'projects.skills': 'Project Skills',
+    'projects.noSkills': 'No skills found in this project',
+    'projects.noSkillsHint': 'No agent skill directories detected. Create .claude/skills/ etc. and add skill folders.',
+    'projects.addFromLibrary': 'Add from Library',
+    'projects.enable': 'Enable',
+    'projects.disable': 'Disable',
+    'projects.remove': 'Remove',
+    'projects.removeProject': 'Remove Project',
+    'projects.confirmRemove': 'Remove this skill?',
+    'projects.confirmRemoveProject': 'Unregister this project? (files not deleted)',
+    'projects.selectAgents': 'Select Agents',
+
+    // Toast - projects
+    'toast.projectAdded': 'Project added',
+    'toast.projectRemoved': 'Project removed',
+    'toast.skillToggled': 'Skill toggled',
+    'toast.skillAddedToProject': 'Skill added to project',
+    'toast.skillRemovedFromProject': 'Skill removed from project',
   },
   zh: {
     'app.title': '技能管理器',
@@ -354,6 +383,35 @@ const translations = {
 
     // Nav additions
     'nav.audit': '操作日志',
+    'nav.projects': '项目工作区',
+    'nav.addProject': '+ 添加项目',
+
+    // Projects
+    'projects.title': '项目工作区',
+    'projects.addProject': '添加项目',
+    'projects.path': '项目路径',
+    'projects.pathPlaceholder': '/绝对路径/到/项目',
+    'projects.noProjects': '暂无注册项目',
+    'projects.noProjectsHint': '添加项目目录以管理其技能',
+    'projects.back': '返回项目列表',
+    'projects.skills': '项目技能',
+    'projects.noSkills': '未在此项目中发现技能',
+    'projects.noSkillsHint': '未发现任何 Agent 的 Skills 目录。可创建 .claude/skills/ 等目录并添加 Skill 文件夹。',
+    'projects.addFromLibrary': '从中央仓库添加 Skill',
+    'projects.enable': '启用',
+    'projects.disable': '禁用',
+    'projects.remove': '删除',
+    'projects.removeProject': '移除项目',
+    'projects.confirmRemove': '确定删除此技能？',
+    'projects.confirmRemoveProject': '取消注册此项目？（不会删除文件）',
+    'projects.selectAgents': '选择智能体',
+
+    // Toast - projects
+    'toast.projectAdded': '项目已添加',
+    'toast.projectRemoved': '项目已移除',
+    'toast.skillToggled': '技能状态已切换',
+    'toast.skillAddedToProject': '技能已添加到项目',
+    'toast.skillRemovedFromProject': '技能已从项目删除',
   },
 } as const
 

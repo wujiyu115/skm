@@ -47,6 +47,22 @@ export interface Agent {
   detected: boolean
 }
 
+export interface Project {
+  id: string
+  name: string
+  path: string
+  created_at: string
+}
+
+export interface ProjectSkill {
+  agent: string
+  agent_display: string
+  skill_name: string
+  description: string
+  skill_path: string
+  enabled: boolean
+}
+
 export const api = {
   skills: {
     list: () => request<Skill[]>('/skills').then(r => r ?? []),
@@ -98,6 +114,18 @@ export const api = {
   },
   agents: {
     list: () => request<Agent[]>('/agents').then(r => r ?? []),
+  },
+  projects: {
+    list: () => request<Project[]>('/projects').then(r => r ?? []),
+    create: (path: string) => request<Project>('/projects', { method: 'POST', body: JSON.stringify({ path }) }),
+    remove: (id: string) => request('/projects/' + id, { method: 'DELETE' }),
+    skills: (id: string) => request<ProjectSkill[]>('/projects/' + id + '/skills').then(r => r ?? []),
+    addSkill: (id: string, skillId: string, agents: string[]) =>
+      request('/projects/' + id + '/skills/add', { method: 'POST', body: JSON.stringify({ skill_id: skillId, agents }) }),
+    toggleSkill: (id: string, agent: string, skillName: string, enabled: boolean) =>
+      request('/projects/' + id + '/skills/toggle', { method: 'PUT', body: JSON.stringify({ agent, skill_name: skillName, enabled }) }),
+    removeSkill: (id: string, skillPath: string) =>
+      request('/projects/' + id + '/skills', { method: 'DELETE', body: JSON.stringify({ skill_path: skillPath }) }),
   },
   sync: {
     status: () => request<{ total: number; synced: number; stale: number }>('/sync/status'),

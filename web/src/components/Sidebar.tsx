@@ -3,9 +3,9 @@ import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, BookOpen, Download, Settings, ClipboardList,
   ChevronDown, ChevronRight, FolderOpen, Globe, Terminal, Code, MousePointer, Sparkles, Languages,
-  Sun, Moon,
+  Sun, Moon, Briefcase,
 } from 'lucide-react'
-import { api, type Group, type Agent, type Skill } from '../lib/api'
+import { api, type Group, type Agent, type Skill, type Project } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 import { useTheme } from '../lib/theme'
 
@@ -22,6 +22,7 @@ export default function Sidebar() {
   const [groups, setGroups] = useState<Group[]>([])
   const [agents, setAgents] = useState<Agent[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
@@ -29,10 +30,12 @@ export default function Sidebar() {
       api.groups.list(),
       api.agents.list(),
       api.skills.list(),
-    ]).then(([g, a, s]) => {
+      api.projects.list(),
+    ]).then(([g, a, s, p]) => {
       setGroups(g ?? [])
       setAgents(a ?? [])
       setSkills(s ?? [])
+      setProjects(p ?? [])
     }).catch(() => {})
   }, [location.pathname])
 
@@ -112,6 +115,45 @@ export default function Sidebar() {
                 className="flex items-center px-3 py-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
               >
                 {t('nav.newGroup')}
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div className="pt-2">
+          <button
+            onClick={() => toggle('projects')}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold uppercase text-slate-400 dark:text-slate-500 w-full hover:text-slate-700 dark:hover:text-slate-300"
+          >
+            {collapsed.projects ? <ChevronRight className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            <Briefcase className="w-3 h-3" />
+            {t('nav.projects')}
+          </button>
+          {!collapsed.projects && (
+            <div className="ml-4 space-y-0.5">
+              {projects.map(p => (
+                <Link
+                  key={p.id}
+                  to={`/projects/${p.id}`}
+                  className={`flex items-center justify-between px-3 py-1.5 rounded-md text-sm transition-colors ${
+                    isActive(`/projects/${p.id}`)
+                      ? 'bg-primary-600 text-white'
+                      : 'hover:bg-slate-100 dark:hover:bg-sidebar-hover'
+                  }`}
+                >
+                  <span>{p.name}</span>
+                </Link>
+              ))}
+              {projects.length === 0 && (
+                <div className="px-3 py-1.5 text-xs text-slate-400 dark:text-slate-500 italic">
+                  {locale === 'zh' ? '暂无项目' : 'No projects'}
+                </div>
+              )}
+              <Link
+                to="/projects"
+                className="flex items-center px-3 py-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+              >
+                {t('nav.addProject')}
               </Link>
             </div>
           )}

@@ -24,6 +24,11 @@ vi.mock('../../lib/api', () => ({
         { ID: 's2', Name: 'sk2', targets: [{ agent: 'claude', skill_id: 's2', target_path: '', mode: 'symlink' }] },
       ]),
     },
+    projects: {
+      list: vi.fn().mockResolvedValue([
+        { id: 'p1', name: 'my-app', path: '/home/user/my-app', created_at: '2026-01-15T10:00:00Z' },
+      ]),
+    },
   },
 }))
 
@@ -80,5 +85,12 @@ describe('Sidebar', () => {
     await screen.findByText('Claude Code')
     await userEvent.click(screen.getByText('Global Workspace'))
     expect(screen.queryByText('Claude Code')).not.toBeInTheDocument()
+  })
+
+  it('renders project workspace section with projects', async () => {
+    renderWithRouter(<Sidebar />)
+    expect(screen.getByText('Project Workspace')).toBeInTheDocument()
+    expect(await screen.findByText('my-app')).toBeInTheDocument()
+    expect(screen.getByText('+ Add Project')).toBeInTheDocument()
   })
 })
