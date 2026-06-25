@@ -22,6 +22,7 @@ func (s *Server) registerSkillRoutes(api fiber.Router) {
 	api.Get("/skills/:id", s.getSkill)
 	api.Delete("/skills/:id", s.deleteSkill)
 	api.Get("/skills/:id/content", s.getSkillContent)
+	api.Put("/skills/:id/enable", s.setSkillEnabled)
 	api.Post("/skills/:id/sync", s.syncSkill)
 }
 
@@ -156,6 +157,36 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 	logger.Info("skills installed", "count", len(installed), "skills", installed)
 	s.writeMetadata()
 	return c.JSON(fiber.Map{"installed": installed})
+}
+
+func (s *Server) setSkillEnabled(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	var req struct {
+		Enabled bool `json:"enabled"`
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "invalid request body"})
+	}
+
+	sk, err := s.store.GetSkillByID(id)
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	if err := s.store.SetSkillEnabled(id, req.Enabled); err != nil {
+		logger.Error("set skill enabled failed", "id", id, "err", err)
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	action := "enable"
+	if !req.Enabled {
+		action = "disable"
+	}
+	s.store.InsertAuditLog(action, sk.Name, "")
+
+	logger.Info("skill "+action+"d", "id", id, "name", sk.Name)
+	return c.JSON(fiber.Map{"ok": true})
 }
 
 func (s *Server) getSkillContent(c *fiber.Ctx) error {
