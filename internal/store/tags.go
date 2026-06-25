@@ -89,15 +89,32 @@ func (s *Store) ListSkillTags(skillID string) ([]string, error) {
 }
 
 // RenameTag renames a tag across all skills.
+// If a skill already has both oldTag and newTag, the conflicting row is
+// silently ignored by UPDATE OR IGNORE, then the leftover old rows are
+// cleaned up by a DELETE.
 func (s *Store) RenameTag(oldTag, newTag string) error {
-	_, err := s.db.Exec(
-		"UPDATE skill_tags SET tag = ? WHERE tag = ?",
-		newTag, oldTag,
-	)
+	tx, err := s.db.Begin()
 	if err != nil {
 		return fmt.Errorf("rename tag: %w", err)
 	}
-	return nil
+	defer tx.Rollback()
+
+	// Rename where there is no PK conflict; skip conflicts silently.
+	if _, err := tx.Exec(
+		"UPDATE OR IGNORE skill_tags SET tag = ? WHERE tag = ?",
+		newTag, oldTag,
+	); err != nil {
+		return fmt.Errorf("rename tag (update): %w", err)
+	}
+
+	// Remove any remaining old-tag rows (these were conflicts).
+	if _, err := tx.Exec(
+		"DELETE FROM skill_tags WHERE tag = ?", oldTag,
+	); err != nil {
+		return fmt.Errorf("rename tag (cleanup): %w", err)
+	}
+
+	return tx.Commit()
 }
 
 // DeleteTag removes a tag from all skills.

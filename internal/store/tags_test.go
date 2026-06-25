@@ -194,6 +194,28 @@ func TestRenameTag(t *testing.T) {
 	}
 }
 
+func TestRenameTag_ConflictBothTags(t *testing.T) {
+	s, sk := newTestStoreWithSkill(t)
+	defer s.Close()
+
+	// Skill has both "tagA" and "tagB".
+	s.AddTag(sk.ID, "tagA")
+	s.AddTag(sk.ID, "tagB")
+
+	// Renaming "tagA" -> "tagB" should succeed (not fail with UNIQUE constraint).
+	if err := s.RenameTag("tagA", "tagB"); err != nil {
+		t.Fatalf("RenameTag() with conflict error: %v", err)
+	}
+
+	tags, err := s.ListSkillTags(sk.ID)
+	if err != nil {
+		t.Fatalf("ListSkillTags() error: %v", err)
+	}
+	if len(tags) != 1 || tags[0] != "tagB" {
+		t.Fatalf("expected [tagB], got %v", tags)
+	}
+}
+
 func TestDeleteTag(t *testing.T) {
 	s, sk := newTestStoreWithSkill(t)
 	defer s.Close()
