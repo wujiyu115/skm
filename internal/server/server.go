@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 
+	"github.com/ejoy/skm/internal/logger"
 	"github.com/ejoy/skm/internal/store"
 )
 
@@ -77,6 +78,7 @@ func (s *Server) Start(port int) error {
 	if s.cfg.DevMode {
 		mode = "development (API only, use Vite for frontend)"
 	}
+	logger.Info("server starting", "port", port, "mode", mode)
 	fmt.Printf("SKM web UI running at http://localhost:%d [%s]\n", port, mode)
 	return s.app.Listen(addr)
 }
@@ -93,7 +95,7 @@ func (s *Server) writeMetadata() {
 		return
 	}
 	if err := s.store.WriteMetadata(s.cfg.MetaDir); err != nil {
-		fmt.Fprintf(os.Stderr, "warning: write metadata: %v\n", err)
+		logger.Warn("write metadata failed", "err", err)
 	}
 }
 

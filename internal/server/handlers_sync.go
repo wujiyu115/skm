@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/ejoy/skm/internal/agent"
+	"github.com/ejoy/skm/internal/logger"
 	skmsync "github.com/ejoy/skm/internal/sync"
 )
 
@@ -42,6 +43,7 @@ func (s *Server) triggerSync(c *fiber.Ctx) error {
 	}
 	c.BodyParser(&req)
 
+	logger.Info("sync triggered", "agents", req.Agents, "dryRun", req.DryRun)
 	skills, _ := s.store.ListSkills()
 	targetAgents := agent.Resolve(req.Agents)
 	cwd, _ := os.Getwd()

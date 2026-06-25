@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/ejoy/skm/internal/agent"
+	"github.com/ejoy/skm/internal/logger"
 	"github.com/ejoy/skm/internal/store"
 )
 
@@ -25,6 +26,7 @@ func NewConfig() (*Config, error) {
 	}
 
 	skmDir := filepath.Join(home, ".skm")
+	logDir := filepath.Join(skmDir, "logs")
 	cfg := &Config{
 		HomeDir:   home,
 		DBPath:    filepath.Join(skmDir, "skm.db"),
@@ -35,6 +37,10 @@ func NewConfig() (*Config, error) {
 
 	os.MkdirAll(cfg.SkillsDir, 0755)
 	os.MkdirAll(cfg.CacheDir, 0755)
+
+	if err := logger.Setup(logger.Config{Dir: logDir, MaxSizeMB: 10, MaxBackups: 5, MaxAgeDays: 30}); err != nil {
+		fmt.Fprintf(os.Stderr, "warning: setup logger: %v\n", err)
+	}
 
 	s, err := store.New(cfg.DBPath)
 	if err != nil {

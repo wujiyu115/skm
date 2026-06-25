@@ -10,6 +10,7 @@ import (
 
 	"github.com/ejoy/skm/internal/agent"
 	"github.com/ejoy/skm/internal/fetcher"
+	"github.com/ejoy/skm/internal/logger"
 	"github.com/ejoy/skm/internal/skill"
 	"github.com/ejoy/skm/internal/store"
 	skmsync "github.com/ejoy/skm/internal/sync"
@@ -59,12 +60,14 @@ func (s *Server) deleteSkill(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	logger.Info("delete skill", "id", sk.ID, "name", sk.Name)
 	targets, _ := s.store.ListTargets(sk.ID)
 	for _, t := range targets {
 		skmsync.Unsync(t.TargetPath)
 	}
 	os.RemoveAll(sk.CentralPath)
 	if err := s.store.DeleteSkill(sk.ID); err != nil {
+		logger.Error("delete skill failed", "id", sk.ID, "err", err)
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
@@ -81,6 +84,8 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "invalid request"})
 	}
+
+	logger.Info("install skill", "source", req.Source, "agents", req.Agents, "global", req.Global)
 
 	src := fetcher.Parse(req.Source)
 
@@ -102,6 +107,7 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 
 	skills, err := skill.Discover(baseDir, src.Subpath)
 	if err != nil || len(skills) == 0 {
+		logger.Warn("no skills found", "source", req.Source, "baseDir", baseDir, "subpath", src.Subpath, "err", err)
 		return c.Status(404).JSON(fiber.Map{"error": "no skills found"})
 	}
 
@@ -147,6 +153,7 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 		installed = append(installed, sk.Name)
 	}
 
+	logger.Info("skills installed", "count", len(installed), "skills", installed)
 	s.writeMetadata()
 	return c.JSON(fiber.Map{"installed": installed})
 }
