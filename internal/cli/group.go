@@ -27,6 +27,7 @@ func newGroupCmd() *cobra.Command {
 		newGroupRemoveCmd(),
 		newGroupInstallCmd(),
 		newGroupDeleteCmd(),
+		newGroupUpdateCmd(),
 	)
 
 	return cmd
@@ -255,6 +256,51 @@ func newGroupInstallCmd() *cobra.Command {
 
 	cmd.Flags().StringSliceVarP(&agentNames, "agent", "a", nil, "Target agent(s)")
 	cmd.Flags().BoolVarP(&global, "global", "g", false, "Install to global directories")
+	return cmd
+}
+
+func newGroupUpdateCmd() *cobra.Command {
+	var (
+		name string
+		desc string
+	)
+
+	cmd := &cobra.Command{
+		Use:   "update <group>",
+		Short: "Update group name or description",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := NewConfig()
+			if err != nil {
+				return err
+			}
+			defer cfg.Close()
+
+			g, err := cfg.Store.GetGroup(args[0])
+			if err != nil {
+				return err
+			}
+
+			newName := g.Name
+			newDesc := g.Description
+			if name != "" {
+				newName = name
+			}
+			if cmd.Flags().Changed("description") {
+				newDesc = desc
+			}
+
+			if err := cfg.Store.UpdateGroup(g.ID, newName, newDesc); err != nil {
+				return fmt.Errorf("update group: %w", err)
+			}
+			cfg.WriteMetadata()
+			color.Green("✓ Updated group %q", newName)
+			return nil
+		},
+	}
+
+	cmd.Flags().StringVarP(&name, "name", "n", "", "New group name")
+	cmd.Flags().StringVarP(&desc, "description", "d", "", "New description")
 	return cmd
 }
 

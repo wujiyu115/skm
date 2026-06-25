@@ -4,6 +4,8 @@
 
 A unified skills management tool for AI coding agents. Single Go binary provides both CLI and web UI.
 
+![SKM Web UI](imgs/install_skill.png)
+
 ## Features
 
 - **Multi-agent support** — Claude Code, Cursor, Codex (extensible)
@@ -54,10 +56,21 @@ skm serve --open
 | `skm list` | List installed skills |
 | `skm show <skill>` | Show skill details and content |
 | `skm remove <skill>` | Remove a skill |
-| `skm sync` | Sync skills to agent directories |
+| `skm enable/disable <skill>` | Enable or disable a skill |
+| `skm sync` | Sync all enabled skills to agents |
+| `skm sync status` | Show sync status (synced/stale/unsynced) |
+| `skm unsync <skill> -a <agent>` | Unsync a skill from specific agent(s) |
 | `skm update [skill\|--all]` | Update git-sourced skills |
-| `skm group <subcommand>` | Manage skill groups |
-| `skm agent list\|add\|remove` | Manage agent adapters |
+| `skm search <query>` | Search skills by name, description, or tag |
+| `skm batch delete\|enable\|disable\|tag\|sync` | Batch operations on multiple skills |
+| `skm group create\|list\|show\|add\|remove\|install\|update\|delete` | Manage skill groups |
+| `skm tag list\|add\|remove\|rename\|delete` | Manage skill tags |
+| `skm agent list\|add\|remove\|skills\|add-skill\|remove-skill` | Manage agents and their skills |
+| `skm project add\|list\|remove\|scan` | Manage project workspaces |
+| `skm audit list\|prune` | View and manage audit log |
+| `skm config list\|get\|set` | Manage settings |
+| `skm export` | Export skill library as JSON |
+| `skm info` | Show diagnostics |
 | `skm serve` | Start web UI (default :3721) |
 | `skm version` | Show version info |
 

@@ -13,6 +13,65 @@ import (
 )
 
 func newSyncCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "sync",
+		Short: "Sync skills to agent directories",
+	}
+
+	cmd.AddCommand(newSyncStatusCmd())
+
+	// Default action: run sync (keep backward-compatible)
+	syncRun := newSyncRunCmd()
+	cmd.RunE = syncRun.RunE
+	cmd.Flags().AddFlagSet(syncRun.Flags())
+
+	return cmd
+}
+
+func newSyncStatusCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "status",
+		Short: "Show sync status summary",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := NewConfig()
+			if err != nil {
+				return err
+			}
+			defer cfg.Close()
+
+			skills, err := cfg.Store.ListSkills()
+			if err != nil {
+				return err
+			}
+
+			total, synced, stale := 0, 0, 0
+			for _, sk := range skills {
+				if !sk.Enabled {
+					continue
+				}
+				total++
+				targets, _ := cfg.Store.ListTargets(sk.ID)
+				if len(targets) > 0 {
+					synced++
+					for _, t := range targets {
+						if t.SourceHash != sk.ContentHash {
+							stale++
+							break
+						}
+					}
+				}
+			}
+
+			fmt.Printf("  Total enabled: %d\n", total)
+			fmt.Printf("  Synced:        %s\n", color.GreenString("%d", synced))
+			fmt.Printf("  Stale:         %s\n", color.YellowString("%d", stale))
+			fmt.Printf("  Not synced:    %s\n", color.RedString("%d", total-synced))
+			return nil
+		},
+	}
+}
+
+func newSyncRunCmd() *cobra.Command {
 	var (
 		agentNames []string
 		dryRun     bool

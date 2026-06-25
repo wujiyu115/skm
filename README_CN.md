@@ -4,6 +4,8 @@
 
 统一的 AI 编程智能体技能管理工具。单个 Go 二进制文件同时提供 CLI 和 Web UI。
 
+![SKM Web UI](imgs/install_skill.png)
+
 ## 功能特性
 
 - **多智能体支持** — Claude Code、Cursor、Codex（可扩展）
@@ -54,10 +56,21 @@ skm serve --open
 | `skm list` | 列出已安装的技能 |
 | `skm show <skill>` | 显示技能详情和内容 |
 | `skm remove <skill>` | 移除技能 |
-| `skm sync` | 同步技能到智能体目录 |
+| `skm enable/disable <skill>` | 启用或禁用技能 |
+| `skm sync` | 同步所有已启用技能到智能体 |
+| `skm sync status` | 查看同步状态（已同步/过期/未同步） |
+| `skm unsync <skill> -a <agent>` | 从指定智能体取消同步 |
 | `skm update [skill\|--all]` | 更新 Git 来源的技能 |
-| `skm group <subcommand>` | 管理技能组 |
-| `skm agent list\|add\|remove` | 管理智能体适配器 |
+| `skm search <query>` | 按名称、描述或标签搜索技能 |
+| `skm batch delete\|enable\|disable\|tag\|sync` | 批量操作多个技能 |
+| `skm group create\|list\|show\|add\|remove\|install\|update\|delete` | 管理技能组 |
+| `skm tag list\|add\|remove\|rename\|delete` | 管理技能标签 |
+| `skm agent list\|add\|remove\|skills\|add-skill\|remove-skill` | 管理智能体及其技能 |
+| `skm project add\|list\|remove\|scan` | 管理项目工作区 |
+| `skm audit list\|prune` | 查看和管理操作日志 |
+| `skm config list\|get\|set` | 管理设置 |
+| `skm export` | 导出技能库为 JSON |
+| `skm info` | 显示诊断信息 |
 | `skm serve` | 启动 Web UI（默认端口 :3721） |
 | `skm version` | 显示版本信息 |
 

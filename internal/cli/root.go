@@ -22,6 +22,8 @@ func NewRoot() *cobra.Command {
 		newEnableCmd(),
 		newDisableCmd(),
 		newSyncCmd(),
+		newUnsyncCmd(),
+		newBatchCmd(),
 		newGroupCmd(),
 		newTagCmd(),
 		newUpdateCmd(),
@@ -33,6 +35,7 @@ func NewRoot() *cobra.Command {
 		newExportCmd(),
 		newInfoCmd(),
 		newProjectCmd(),
+		newAuditCmd(),
 	)
 
 	return root

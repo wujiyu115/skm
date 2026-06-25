@@ -18,6 +18,7 @@ func newTagCmd() *cobra.Command {
 		newTagAddCmd(),
 		newTagRemoveCmd(),
 		newTagRenameCmd(),
+		newTagDeleteCmd(),
 	)
 
 	return cmd
@@ -136,4 +137,25 @@ func tagRename(cfg *Config, oldTag, newTag string) error {
 
 	color.Green("Renamed tag %q to %q", oldTag, newTag)
 	return nil
+}
+
+func newTagDeleteCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete <tag>",
+		Short: "Delete a tag from all skills",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := NewConfig()
+			if err != nil {
+				return err
+			}
+			defer cfg.Close()
+
+			if err := cfg.Store.DeleteTag(args[0]); err != nil {
+				return fmt.Errorf("delete tag: %w", err)
+			}
+			color.Green("Deleted tag %q from all skills", args[0])
+			return nil
+		},
+	}
 }
