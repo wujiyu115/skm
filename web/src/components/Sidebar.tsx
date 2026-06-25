@@ -52,10 +52,10 @@ export default function Sidebar() {
   ]
 
   return (
-    <nav className="w-64 bg-sidebar text-slate-300 flex flex-col h-screen" data-testid="sidebar">
-      <div className="p-5 flex items-center gap-2 border-b border-slate-700">
-        <Sparkles className="w-6 h-6 text-primary-400" />
-        <span className="font-bold text-white text-lg">{t('app.title')}</span>
+    <nav className="w-64 bg-white dark:bg-sidebar text-slate-600 dark:text-slate-300 border-r border-slate-200 dark:border-slate-700 flex flex-col h-screen" data-testid="sidebar">
+      <div className="p-5 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
+        <Sparkles className="w-6 h-6 text-primary-500 dark:text-primary-400" />
+        <span className="font-bold text-slate-900 dark:text-white text-lg">{t('app.title')}</span>
       </div>
 
       <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
@@ -68,7 +68,7 @@ export default function Sidebar() {
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 isActive(item.path)
                   ? 'bg-primary-600 text-white font-medium'
-                  : 'hover:bg-sidebar-hover'
+                  : 'hover:bg-slate-100 dark:hover:bg-sidebar-hover'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -80,7 +80,7 @@ export default function Sidebar() {
         <div className="pt-4">
           <button
             onClick={() => toggle('presets')}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold uppercase text-slate-500 w-full hover:text-slate-300"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold uppercase text-slate-400 dark:text-slate-500 w-full hover:text-slate-700 dark:hover:text-slate-300"
           >
             {collapsed.presets ? <ChevronRight className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             <FolderOpen className="w-3 h-3" />
@@ -95,21 +95,21 @@ export default function Sidebar() {
                   className={`flex items-center justify-between px-3 py-1.5 rounded-md text-sm transition-colors ${
                     isActive(`/groups/${g.id}`)
                       ? 'bg-primary-600 text-white'
-                      : 'hover:bg-sidebar-hover'
+                      : 'hover:bg-slate-100 dark:hover:bg-sidebar-hover'
                   }`}
                 >
                   <span>{g.name}</span>
-                  <span className="text-xs text-slate-500">{g.skill_count ?? 0}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{g.skill_count ?? 0}</span>
                 </Link>
               ))}
               {groups.length === 0 && (
-                <div className="px-3 py-1.5 text-xs text-slate-500 italic">
+                <div className="px-3 py-1.5 text-xs text-slate-400 dark:text-slate-500 italic">
                   {locale === 'zh' ? '暂无分组' : 'No groups'}
                 </div>
               )}
               <Link
                 to="/groups"
-                className="flex items-center px-3 py-1.5 text-xs text-slate-500 hover:text-slate-300"
+                className="flex items-center px-3 py-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
               >
                 {t('nav.newGroup')}
               </Link>
@@ -120,7 +120,7 @@ export default function Sidebar() {
         <div className="pt-2">
           <button
             onClick={() => toggle('agents')}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold uppercase text-slate-500 w-full hover:text-slate-300"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold uppercase text-slate-400 dark:text-slate-500 w-full hover:text-slate-700 dark:hover:text-slate-300"
           >
             {collapsed.agents ? <ChevronRight className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             <Globe className="w-3 h-3" />
@@ -133,7 +133,7 @@ export default function Sidebar() {
                 className={`flex items-center justify-between px-3 py-1.5 rounded-md text-sm transition-colors ${
                   location.pathname === '/agents' && !location.pathname.includes('/agents/')
                     ? 'bg-primary-600 text-white'
-                    : 'hover:bg-sidebar-hover'
+                    : 'hover:bg-slate-100 dark:hover:bg-sidebar-hover'
                 }`}
               >
                 <span>{t('nav.allAgents')}</span>
@@ -148,7 +148,7 @@ export default function Sidebar() {
                     className={`flex items-center justify-between px-3 py-1.5 rounded-md text-sm transition-colors ${
                       isActive(`/agents/${a.name}`)
                         ? 'bg-primary-600 text-white'
-                        : 'hover:bg-sidebar-hover'
+                        : 'hover:bg-slate-100 dark:hover:bg-sidebar-hover'
                     }`}
                   >
                     <span className="flex items-center gap-2">
@@ -157,7 +157,7 @@ export default function Sidebar() {
                     </span>
                     <span className="flex items-center gap-1.5">
                       {a.detected && <span className="w-1.5 h-1.5 rounded-full bg-primary-400" />}
-                      <span className="text-xs text-slate-500">{count}</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">{count}</span>
                     </span>
                   </Link>
                 )
@@ -167,17 +167,17 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div className="p-3 border-t border-slate-700 space-y-1">
+      <div className="p-3 border-t border-slate-200 dark:border-slate-700 space-y-1">
         <button
           onClick={toggleTheme}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full hover:bg-sidebar-hover transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full hover:bg-slate-100 dark:hover:bg-sidebar-hover transition-colors"
         >
           {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           {theme === 'light' ? (locale === 'zh' ? '深色模式' : 'Dark Mode') : (locale === 'zh' ? '浅色模式' : 'Light Mode')}
         </button>
         <button
           onClick={() => setLocale(locale === 'en' ? 'zh' : 'en')}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full hover:bg-sidebar-hover transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full hover:bg-slate-100 dark:hover:bg-sidebar-hover transition-colors"
         >
           <Languages className="w-4 h-4" />
           {locale === 'en' ? '中文' : 'English'}
@@ -187,7 +187,7 @@ export default function Sidebar() {
           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
             isActive('/settings')
               ? 'bg-primary-600 text-white font-medium'
-              : 'hover:bg-sidebar-hover'
+              : 'hover:bg-slate-100 dark:hover:bg-sidebar-hover'
           }`}
         >
           <Settings className="w-4 h-4" />
