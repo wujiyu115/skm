@@ -23,6 +23,7 @@ func NewRoot() *cobra.Command {
 		newDisableCmd(),
 		newSyncCmd(),
 		newGroupCmd(),
+		newTagCmd(),
 		newUpdateCmd(),
 		newAgentCmd(),
 		newServeCmd(),
