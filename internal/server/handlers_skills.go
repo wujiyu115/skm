@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -73,6 +74,9 @@ func (s *Server) deleteSkill(c *fiber.Ctx) error {
 	}
 
 	s.writeMetadata()
+	if err := s.store.InsertAuditLog("delete", sk.Name, ""); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
 	return c.JSON(fiber.Map{"ok": true})
 }
 
@@ -156,6 +160,9 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 
 	logger.Info("skills installed", "count", len(installed), "skills", installed)
 	s.writeMetadata()
+	if err := s.store.InsertAuditLog("install", strings.Join(installed, ","), fmt.Sprintf("source=%s", req.Source)); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
 	return c.JSON(fiber.Map{"installed": installed})
 }
 
@@ -233,7 +240,11 @@ func (s *Server) syncSkill(c *fiber.Ctx) error {
 		}
 	}
 
-	if err := s.store.InsertAuditLog("sync", sk.Name, ""); err != nil {
+	agentNames := make([]string, len(targetAgents))
+	for i, ag := range targetAgents {
+		agentNames[i] = ag.Name
+	}
+	if err := s.store.InsertAuditLog("sync", sk.Name, strings.Join(agentNames, ",")); err != nil {
 		logger.Warn("audit log failed", "err", err)
 	}
 
