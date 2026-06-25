@@ -32,7 +32,7 @@ func (s *Server) batchDelete(c *fiber.Ctx) error {
 	}
 
 	processed := 0
-	var errors []string
+	errors := []string{}
 
 	for _, id := range req.IDs {
 		sk, err := s.store.GetSkillByID(id)
@@ -41,16 +41,20 @@ func (s *Server) batchDelete(c *fiber.Ctx) error {
 			continue
 		}
 
-		targets, _ := s.store.ListTargets(sk.ID)
-		for _, t := range targets {
-			skmsync.Unsync(t.TargetPath)
-		}
-		os.RemoveAll(sk.CentralPath)
-
 		if err := s.store.DeleteSkill(sk.ID); err != nil {
 			logger.Error("batch delete skill failed", "id", sk.ID, "err", err)
 			errors = append(errors, fmt.Sprintf("%s: %v", id, err))
 			continue
+		}
+
+		targets, _ := s.store.ListTargets(sk.ID)
+		for _, t := range targets {
+			if err := skmsync.Unsync(t.TargetPath); err != nil {
+				logger.Warn("batch delete unsync failed", "target", t.TargetPath, "err", err)
+			}
+		}
+		if err := os.RemoveAll(sk.CentralPath); err != nil {
+			logger.Warn("batch delete remove files failed", "path", sk.CentralPath, "err", err)
 		}
 
 		if err := s.store.InsertAuditLog("batch_delete", sk.Name, ""); err != nil {
@@ -76,7 +80,7 @@ func (s *Server) batchEnable(c *fiber.Ctx) error {
 	}
 
 	processed := 0
-	var errors []string
+	errors := []string{}
 
 	action := "batch_enable"
 	if !req.Enabled {
@@ -125,7 +129,7 @@ func (s *Server) batchTag(c *fiber.Ctx) error {
 	}
 
 	processed := 0
-	var errors []string
+	errors := []string{}
 
 	for _, id := range req.IDs {
 		sk, err := s.store.GetSkillByID(id)
@@ -191,7 +195,7 @@ func (s *Server) batchSync(c *fiber.Ctx) error {
 	cwd, _ := os.Getwd()
 
 	processed := 0
-	var errors []string
+	errors := []string{}
 
 	for _, id := range req.IDs {
 		sk, err := s.store.GetSkillByID(id)

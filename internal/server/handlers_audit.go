@@ -17,6 +17,9 @@ func (s *Server) listAuditLog(c *fiber.Ctx) error {
 	limit := 100
 	if q := c.Query("limit"); q != "" {
 		if n, err := strconv.Atoi(q); err == nil && n > 0 {
+			if n > 10000 {
+				n = 10000
+			}
 			limit = n
 		}
 	}

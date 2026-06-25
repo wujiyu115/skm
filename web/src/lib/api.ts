@@ -130,8 +130,8 @@ export const api = {
       }),
   },
   tags: {
-    list: () => request<string[]>('/tags').then(r => r ?? []),
-    getForSkill: (skillId: string) => request<string[]>(`/skills/${skillId}/tags`).then(r => r ?? []),
+    list: () => request<{tags: string[]}>('/tags').then(r => r?.tags ?? []),
+    getForSkill: (skillId: string) => request<{tags: string[]}>(`/skills/${skillId}/tags`).then(r => r?.tags ?? []),
     setForSkill: (skillId: string, tags: string[]) =>
       request(`/skills/${skillId}/tags`, { method: 'PUT', body: JSON.stringify({ tags }) }),
   },
