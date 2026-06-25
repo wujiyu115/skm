@@ -42,7 +42,7 @@ export default function SkillCard({ skill, onRemove, onSync, onToggleEnabled, se
           onClick={() => onToggleEnabled?.(skill.ID, !skill.Enabled)}
           className={`px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer transition-colors ${
             skill.Enabled
-              ? 'bg-green-100 text-green-700 hover:bg-green-200'
+              ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'
               : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
           }`}
         >
