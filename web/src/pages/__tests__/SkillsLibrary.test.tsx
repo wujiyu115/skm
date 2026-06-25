@@ -16,6 +16,17 @@ vi.mock('../../lib/api', () => ({
       remove: vi.fn().mockResolvedValue({}),
       sync: vi.fn().mockResolvedValue({}),
     },
+    tags: {
+      list: vi.fn().mockResolvedValue(['frontend', 'backend']),
+      getForSkill: vi.fn().mockImplementation((id: string) => {
+        const map: Record<string, string[]> = {
+          '1': ['frontend'],
+          '2': ['backend'],
+          '3': [],
+        }
+        return Promise.resolve(map[id] ?? [])
+      }),
+    },
     sync: { trigger: vi.fn().mockResolvedValue({}) },
   },
 }))
@@ -65,5 +76,15 @@ describe('SkillsLibrary', () => {
     renderWithRouter(<SkillsLibrary />)
     expect(screen.getByText('Sync')).toBeInTheDocument()
     expect(screen.getByText('Check All')).toBeInTheDocument()
+  })
+
+  it('renders tag filter with tags from API', async () => {
+    renderWithRouter(<SkillsLibrary />)
+    // "frontend" and "backend" appear both as TagFilter pills and as tag pills on skill cards
+    const frontendElements = await screen.findAllByText('frontend')
+    expect(frontendElements.length).toBeGreaterThanOrEqual(1)
+    const backendElements = screen.getAllByText('backend')
+    expect(backendElements.length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('Untagged')).toBeInTheDocument()
   })
 })

@@ -1,9 +1,11 @@
 import { GitBranch, FolderOpen, Trash2, RefreshCw } from 'lucide-react'
 import type { Skill } from '../lib/api'
 import { useI18n } from '../lib/i18n'
+import { getTagColor } from '../lib/tagColors'
 
 interface SkillCardProps {
   skill: Skill
+  tags?: string[]
   onRemove?: (id: string) => void
   onSync?: (id: string) => void
   onToggleEnabled?: (id: string, enabled: boolean) => void
@@ -17,7 +19,7 @@ const agentColors: Record<string, string> = {
   codex: 'bg-purple-100 text-purple-700',
 }
 
-export default function SkillCard({ skill, onRemove, onSync, onToggleEnabled, selected, onSelect }: SkillCardProps) {
+export default function SkillCard({ skill, tags, onRemove, onSync, onToggleEnabled, selected, onSelect }: SkillCardProps) {
   const { t } = useI18n()
   const sourceIcon = skill.SourceType === 'git'
     ? <GitBranch className="w-3 h-3" />
@@ -51,6 +53,19 @@ export default function SkillCard({ skill, onRemove, onSync, onToggleEnabled, se
       </div>
 
       <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">{skill.Description}</p>
+
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {tags.map(tag => (
+            <span
+              key={tag}
+              className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${getTagColor(tag)}`}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="flex items-center gap-2 mt-3">
         {onSync && (

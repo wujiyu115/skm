@@ -75,4 +75,21 @@ describe('SkillCard', () => {
     await userEvent.click(screen.getByRole('checkbox'))
     expect(onSelect).toHaveBeenCalledWith('skill-1')
   })
+
+  it('renders tag pills when tags provided', () => {
+    renderWithRouter(<SkillCard skill={mockSkill()} tags={['frontend', 'react']} />)
+    expect(screen.getByText('frontend')).toBeInTheDocument()
+    expect(screen.getByText('react')).toBeInTheDocument()
+  })
+
+  it('does not render tag section when tags is empty', () => {
+    renderWithRouter(<SkillCard skill={mockSkill()} tags={[]} />)
+    expect(screen.queryByText('frontend')).not.toBeInTheDocument()
+  })
+
+  it('does not render tag section when tags is undefined', () => {
+    renderWithRouter(<SkillCard skill={mockSkill()} />)
+    // Should render without errors, no tag pills visible
+    expect(screen.getByText('test-skill')).toBeInTheDocument()
+  })
 })

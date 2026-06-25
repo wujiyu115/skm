@@ -22,6 +22,7 @@ export interface Skill {
   ContentHash: string
   Enabled: boolean
   targets?: Target[]
+  tags?: string[]
 }
 
 export interface Target {
@@ -105,6 +106,12 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ agents }),
       }),
+  },
+  tags: {
+    list: () => request<string[]>('/tags').then(r => r ?? []),
+    getForSkill: (skillId: string) => request<string[]>(`/skills/${skillId}/tags`).then(r => r ?? []),
+    setForSkill: (skillId: string, tags: string[]) =>
+      request(`/skills/${skillId}/tags`, { method: 'PUT', body: JSON.stringify({ tags }) }),
   },
   settings: {
     get: () => request<Record<string, string>>('/settings'),

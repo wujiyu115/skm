@@ -14,13 +14,32 @@ export default function SkillsLibrary() {
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState<Tab>('all')
   const [activeTags, setActiveTags] = useState<string[]>([])
+  const [allTags, setAllTags] = useState<string[]>([])
+  const [skillTags, setSkillTags] = useState<Record<string, string[]>>({})
   const [selectedSkills, setSelectedSkills] = useState<Set<string>>(new Set())
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [source, setSource] = useState('')
   const [installing, setInstalling] = useState(false)
 
   const load = () => {
-    api.skills.list().then(setSkills).catch(() => {})
+    api.skills.list().then(loadedSkills => {
+      setSkills(loadedSkills)
+      // Fetch tags for each skill
+      Promise.all(
+        loadedSkills.map(sk =>
+          api.tags.getForSkill(sk.ID)
+            .then(tags => ({ id: sk.ID, tags }))
+            .catch(() => ({ id: sk.ID, tags: [] as string[] }))
+        )
+      ).then(results => {
+        const tagMap: Record<string, string[]> = {}
+        for (const r of results) {
+          tagMap[r.id] = r.tags
+        }
+        setSkillTags(tagMap)
+      })
+    }).catch(() => {})
+    api.tags.list().then(setAllTags).catch(() => {})
   }
   useEffect(() => { load() }, [])
 
@@ -36,8 +55,6 @@ export default function SkillsLibrary() {
     }
   }
 
-  const tags = [...new Set(skills.map(s => s.SourceType).filter(Boolean))]
-
   const toggleTag = (tag: string) => {
     setActiveTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
@@ -49,7 +66,17 @@ export default function SkillsLibrary() {
         !sk.Description.toLowerCase().includes(search.toLowerCase())) return false
     if (activeTab === 'enabled' && !sk.Enabled) return false
     if (activeTab === 'available' && sk.Enabled) return false
-    if (activeTags.length > 0 && !activeTags.includes(sk.SourceType)) return false
+    if (activeTags.length > 0) {
+      const skTags = skillTags[sk.ID] ?? []
+      if (activeTags.includes('__untagged__')) {
+        // Show skills with no tags OR matching any other active tags
+        const otherTags = activeTags.filter(t => t !== '__untagged__')
+        if (skTags.length === 0) return true
+        if (otherTags.length > 0 && otherTags.some(t => skTags.includes(t))) return true
+        return false
+      }
+      if (!activeTags.some(t => skTags.includes(t))) return false
+    }
     return true
   })
 
@@ -184,9 +211,9 @@ export default function SkillsLibrary() {
         </div>
       </div>
 
-      {tags.length > 0 && (
+      {allTags.length > 0 && (
         <div className="mb-5">
-          <TagFilter tags={tags} activeTags={activeTags} onToggle={toggleTag} />
+          <TagFilter tags={allTags} activeTags={activeTags} onToggle={toggleTag} />
         </div>
       )}
 
@@ -204,6 +231,7 @@ export default function SkillsLibrary() {
             <SkillCard
               key={sk.ID}
               skill={sk}
+              tags={skillTags[sk.ID]}
               selected={selectedSkills.has(sk.ID)}
               onSelect={toggleSelect}
               onRemove={removeSkill}
