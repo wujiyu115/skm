@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
 import Dashboard from './pages/Dashboard'
 import SkillsLibrary from './pages/SkillsLibrary'
+import Install from './pages/Install'
 import Groups from './pages/Groups'
 import AgentWorkspace from './pages/AgentWorkspace'
 import Settings from './pages/Settings'
@@ -14,7 +15,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/skills" element={<SkillsLibrary />} />
-          <Route path="/install" element={<SkillsLibrary />} />
+          <Route path="/install" element={<Install />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/groups/:id" element={<Groups />} />
           <Route path="/agents" element={<AgentWorkspace />} />
