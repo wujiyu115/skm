@@ -16,19 +16,48 @@ interface RegistrySkill {
 }
 
 const registry: RegistrySkill[] = [
-  { name: 'find-skills', description: 'Discover and search for AI agent skills', source: '@anthropics/skills', repo: 'anthropics/skills', category: 'official', icon: '🔍' },
-  { name: 'frontend-design', description: 'Frontend UI/UX design patterns and components', source: '@anthropics/skills', repo: 'anthropics/skills', category: 'official', icon: '🎨' },
-  { name: 'agent-browser', description: 'Browser automation and web scraping skills', source: '@vercel-labs/agent-skills', repo: 'vercel-labs/agent-skills', category: 'official', icon: '🌐' },
-  { name: 'vercel-react-best-practices', description: 'React best practices from Vercel team', source: '@vercel-labs/agent-skills', repo: 'vercel-labs/agent-skills', category: 'official', icon: '⚛️' },
-  { name: 'web-design-guidelines', description: 'Web design guidelines and accessibility', source: '@vercel-labs/agent-skills', repo: 'vercel-labs/agent-skills', category: 'official', icon: '📐' },
-  { name: 'microsoft-foundry', description: 'Microsoft Foundry integration skills', source: '@anthropics/skills', repo: 'anthropics/skills', category: 'official', icon: '🏗️' },
-  { name: 'azure-ai', description: 'Azure AI services integration', source: '@microsoft/azure-skills', repo: 'microsoft/azure-skills', category: 'official', icon: '🤖' },
-  { name: 'azure-deploy', description: 'Azure deployment and CI/CD automation', source: '@microsoft/azure-skills', repo: 'microsoft/azure-skills', category: 'official', icon: '🚀' },
-  { name: 'azure-diagnostics', description: 'Azure diagnostics and monitoring', source: '@microsoft/azure-skills', repo: 'microsoft/azure-skills', category: 'official', icon: '🔧' },
-  { name: 'azure-prepare', description: 'Azure environment preparation and setup', source: '@microsoft/azure-skills', repo: 'microsoft/azure-skills', category: 'official', icon: '📦' },
-  { name: 'azure-storage', description: 'Azure storage management skills', source: '@microsoft/azure-skills', repo: 'microsoft/azure-skills', category: 'official', icon: '💾' },
-  { name: 'azure-validate', description: 'Azure configuration validation', source: '@microsoft/azure-skills', repo: 'microsoft/azure-skills', category: 'official', icon: '✅' },
-  { name: 'remoetions-dev-skills', description: 'Remote development workflow skills', source: '@remoetions/dev-skills', repo: 'remoetions/dev-skills', category: 'community', icon: '💻' },
+  // Anthropic official
+  { name: 'find-skills', description: 'Discover and search for AI agent skills', source: 'anthropics/skills', repo: 'anthropics/skills/find-skills', category: 'official', icon: '🔍' },
+  { name: 'frontend-design', description: 'Frontend UI/UX design patterns and components', source: 'anthropics/skills', repo: 'anthropics/skills/frontend-design', category: 'official', icon: '🎨' },
+  { name: 'skill-creator', description: 'Create new agent skills from scratch', source: 'anthropics/skills', repo: 'anthropics/skills/skill-creator', category: 'official', icon: '🛠️' },
+  { name: 'webapp-testing', description: 'Web application testing strategies', source: 'anthropics/skills', repo: 'anthropics/skills/webapp-testing', category: 'official', icon: '🧪' },
+  { name: 'pptx', description: 'PowerPoint file generation and manipulation', source: 'anthropics/skills', repo: 'anthropics/skills/pptx', category: 'official', icon: '📊' },
+  { name: 'pdf', description: 'PDF document generation', source: 'anthropics/skills', repo: 'anthropics/skills/pdf', category: 'official', icon: '📄' },
+  { name: 'docx', description: 'Word document generation', source: 'anthropics/skills', repo: 'anthropics/skills/docx', category: 'official', icon: '📝' },
+  // Vercel
+  { name: 'vercel-react-best-practices', description: 'React best practices from Vercel team', source: 'vercel-labs/agent-skills', repo: 'vercel-labs/agent-skills/vercel-react-best-practices', category: 'official', icon: '⚛️' },
+  { name: 'web-design-guidelines', description: 'Web design guidelines and accessibility', source: 'vercel-labs/agent-skills', repo: 'vercel-labs/agent-skills/web-design-guidelines', category: 'official', icon: '📐' },
+  { name: 'agent-browser', description: 'Browser automation and web scraping', source: 'vercel-labs/agent-browser', repo: 'vercel-labs/agent-browser/agent-browser', category: 'official', icon: '🌐' },
+  { name: 'next-best-practices', description: 'Next.js best practices and patterns', source: 'vercel-labs/next-skills', repo: 'vercel-labs/next-skills/next-best-practices', category: 'official', icon: '▲' },
+  // Microsoft Azure
+  { name: 'microsoft-foundry', description: 'Microsoft Foundry integration skills', source: 'microsoft/azure-skills', repo: 'microsoft/azure-skills/microsoft-foundry', category: 'official', icon: '🏗️' },
+  { name: 'azure-ai', description: 'Azure AI services integration', source: 'microsoft/azure-skills', repo: 'microsoft/azure-skills/azure-ai', category: 'official', icon: '🤖' },
+  { name: 'azure-deploy', description: 'Azure deployment and CI/CD automation', source: 'microsoft/azure-skills', repo: 'microsoft/azure-skills/azure-deploy', category: 'official', icon: '🚀' },
+  { name: 'azure-diagnostics', description: 'Azure diagnostics and monitoring', source: 'microsoft/azure-skills', repo: 'microsoft/azure-skills/azure-diagnostics', category: 'official', icon: '🔧' },
+  { name: 'azure-kubernetes', description: 'Azure Kubernetes Service management', source: 'microsoft/azure-skills', repo: 'microsoft/azure-skills/azure-kubernetes', category: 'official', icon: '☸️' },
+  { name: 'azure-storage', description: 'Azure storage management', source: 'microsoft/azure-skills', repo: 'microsoft/azure-skills/azure-storage', category: 'official', icon: '💾' },
+  // Supabase & Firebase
+  { name: 'supabase', description: 'Supabase development best practices', source: 'supabase/agent-skills', repo: 'supabase/agent-skills/supabase', category: 'official', icon: '⚡' },
+  { name: 'firebase-basics', description: 'Firebase fundamentals and setup', source: 'firebase/agent-skills', repo: 'firebase/agent-skills/firebase-basics', category: 'official', icon: '🔥' },
+  // Matt Pocock
+  { name: 'tdd', description: 'Test-driven development workflow', source: 'mattpocock/skills', repo: 'mattpocock/skills/tdd', category: 'community', icon: '✅' },
+  { name: 'grill-me', description: 'Code review with tough questions', source: 'mattpocock/skills', repo: 'mattpocock/skills/grill-me', category: 'community', icon: '🔥' },
+  { name: 'diagnose', description: 'Systematic problem diagnosis', source: 'mattpocock/skills', repo: 'mattpocock/skills/diagnose', category: 'community', icon: '🩺' },
+  { name: 'to-prd', description: 'Convert ideas to product requirements', source: 'mattpocock/skills', repo: 'mattpocock/skills/to-prd', category: 'community', icon: '📋' },
+  { name: 'improve-codebase-architecture', description: 'Analyze and improve code architecture', source: 'mattpocock/skills', repo: 'mattpocock/skills/improve-codebase-architecture', category: 'community', icon: '🏛️' },
+  // Obra Superpowers
+  { name: 'brainstorming', description: 'Structured brainstorming sessions', source: 'obra/superpowers', repo: 'obra/superpowers/brainstorming', category: 'community', icon: '💡' },
+  { name: 'systematic-debugging', description: 'Systematic approach to debugging', source: 'obra/superpowers', repo: 'obra/superpowers/systematic-debugging', category: 'community', icon: '🐛' },
+  { name: 'writing-plans', description: 'Write detailed implementation plans', source: 'obra/superpowers', repo: 'obra/superpowers/writing-plans', category: 'community', icon: '📝' },
+  { name: 'requesting-code-review', description: 'Request thorough code reviews', source: 'obra/superpowers', repo: 'obra/superpowers/requesting-code-review', category: 'community', icon: '👀' },
+  // Other community
+  { name: 'remotion-best-practices', description: 'Remotion video rendering best practices', source: 'remotion-dev/skills', repo: 'remotion-dev/skills/remotion-best-practices', category: 'community', icon: '🎬' },
+  { name: 'shadcn', description: 'shadcn/ui component patterns', source: 'shadcn/ui', repo: 'shadcn/ui/shadcn', category: 'community', icon: '🎨' },
+  { name: 'just-scrape', description: 'Web scraping with ScrapeGraph AI', source: 'scrapegraphai/just-scrape', repo: 'scrapegraphai/just-scrape/just-scrape', category: 'community', icon: '🕷️' },
+  { name: 'caveman', description: 'Terse caveman-style communication mode', source: 'juliusbrussee/caveman', repo: 'juliusbrussee/caveman/caveman', category: 'community', icon: '🦴' },
+  { name: 'emil-design-eng', description: 'Design engineering patterns by Emil Kowalski', source: 'emilkowalski/skills', repo: 'emilkowalski/skills/emil-design-eng', category: 'community', icon: '✨' },
+  { name: 'extract-design-system', description: 'Extract design system from existing code', source: 'arvindrk/extract-design-system', repo: 'arvindrk/extract-design-system/extract-design-system', category: 'community', icon: '🎯' },
+  { name: 'sentry-cli', description: 'Sentry error tracking CLI integration', source: 'sentry/dev', repo: 'sentry/dev/sentry-cli', category: 'community', icon: '🛡️' },
 ]
 
 const sources = [...new Set(registry.map(s => s.source))]
