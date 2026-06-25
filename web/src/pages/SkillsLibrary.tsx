@@ -1,8 +1,18 @@
 import { useEffect, useState } from 'react'
+import { Search, LayoutGrid, List, RefreshCw, CheckSquare, Download } from 'lucide-react'
 import { api, type Skill } from '../lib/api'
+import SkillCard from '../components/SkillCard'
+import TagFilter from '../components/TagFilter'
+
+type Tab = 'all' | 'enabled' | 'available'
 
 export default function SkillsLibrary() {
   const [skills, setSkills] = useState<Skill[]>([])
+  const [search, setSearch] = useState('')
+  const [activeTab, setActiveTab] = useState<Tab>('all')
+  const [activeTags, setActiveTags] = useState<string[]>([])
+  const [selectedSkills, setSelectedSkills] = useState<Set<string>>(new Set())
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [source, setSource] = useState('')
   const [installing, setInstalling] = useState(false)
 
@@ -23,44 +33,169 @@ export default function SkillsLibrary() {
     }
   }
 
+  const tags = [...new Set(skills.map(s => s.SourceType).filter(Boolean))]
+
+  const toggleTag = (tag: string) => {
+    setActiveTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    )
+  }
+
+  const filtered = skills.filter(sk => {
+    if (search && !sk.Name.toLowerCase().includes(search.toLowerCase()) &&
+        !sk.Description.toLowerCase().includes(search.toLowerCase())) return false
+    if (activeTab === 'enabled' && !sk.Enabled) return false
+    if (activeTab === 'available' && sk.Enabled) return false
+    if (activeTags.length > 0 && !activeTags.includes(sk.SourceType)) return false
+    return true
+  })
+
+  const toggleSelect = (id: string) => {
+    setSelectedSkills(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const checkAll = () => {
+    if (selectedSkills.size === filtered.length) {
+      setSelectedSkills(new Set())
+    } else {
+      setSelectedSkills(new Set(filtered.map(s => s.ID)))
+    }
+  }
+
+  const syncAll = async () => {
+    try {
+      await api.sync.trigger([])
+      load()
+    } catch { /* ignore */ }
+  }
+
+  const removeSkill = async (id: string) => {
+    try {
+      await api.skills.remove(id)
+      load()
+    } catch { /* ignore */ }
+  }
+
+  const tabs: { key: Tab; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'enabled', label: 'Enabled' },
+    { key: 'available', label: 'Available' },
+  ]
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Skills Library</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-slate-900">Library</h2>
+          <span className="px-2.5 py-0.5 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
+            {skills.length}
+          </span>
+        </div>
         <div className="flex gap-2">
           <input
             value={source}
             onChange={e => setSource(e.target.value)}
             placeholder="owner/repo or URL..."
-            className="px-3 py-2 border rounded-md text-sm w-80"
+            className="px-3 py-2 border border-slate-200 rounded-lg text-sm w-72 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             onKeyDown={e => e.key === 'Enter' && install()}
           />
           <button
             onClick={install}
             disabled={installing}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
           >
+            <Download className="w-4 h-4" />
             {installing ? 'Installing...' : 'Install'}
           </button>
         </div>
       </div>
-      {skills.length === 0 ? (
-        <p className="text-gray-500">No skills installed yet.</p>
+
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search skills in the control library..."
+          className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+        />
+      </div>
+
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-1">
+          {tabs.map(t => (
+            <button
+              key={t.key}
+              onClick={() => setActiveTab(t.key)}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === t.key
+                  ? 'bg-primary-600 text-white'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={syncAll}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Sync
+          </button>
+          <button
+            onClick={checkAll}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+          >
+            <CheckSquare className="w-3.5 h-3.5" /> Check All
+          </button>
+          <div className="flex border border-slate-200 rounded-lg overflow-hidden ml-2">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 ${viewMode === 'grid' ? 'bg-primary-600 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 ${viewMode === 'list' ? 'bg-primary-600 text-white' : 'text-slate-500 hover:bg-slate-50'}`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {tags.length > 0 && (
+        <div className="mb-5">
+          <TagFilter tags={tags} activeTags={activeTags} onToggle={toggleTag} />
+        </div>
+      )}
+
+      {filtered.length === 0 ? (
+        <div className="text-center py-12 text-slate-500">
+          <p className="text-lg">No skills found</p>
+          <p className="text-sm mt-1">Install a skill using the input above</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
-          {skills.map(sk => (
-            <div key={sk.ID} className="bg-white rounded-lg border p-4">
-              <div className="font-medium text-gray-900">{sk.Name}</div>
-              <div className="text-sm text-gray-500 mt-1">{sk.Description}</div>
-              <div className="flex gap-1 mt-3">
-                {(sk.targets ?? []).map(t => (
-                  <span key={t.agent} className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">
-                    {t.agent}
-                  </span>
-                ))}
-              </div>
-              <div className="text-xs text-gray-400 mt-2">{sk.SourceType}: {sk.SourceRef}</div>
-            </div>
+        <div className={viewMode === 'grid'
+          ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'
+          : 'space-y-3'
+        }>
+          {filtered.map(sk => (
+            <SkillCard
+              key={sk.ID}
+              skill={sk}
+              selected={selectedSkills.has(sk.ID)}
+              onSelect={toggleSelect}
+              onRemove={removeSkill}
+              onSync={id => api.skills.sync(id, []).then(load)}
+            />
           ))}
         </div>
       )}
