@@ -46,7 +46,7 @@ func newDisableCmd() *cobra.Command {
 func setSkillEnabled(cfg *Config, name string, enabled bool) error {
 	sk, err := cfg.Store.GetSkill(name)
 	if err != nil {
-		return fmt.Errorf("skill %q not found", name)
+		return fmt.Errorf("skill %q: %w", name, err)
 	}
 
 	if err := cfg.Store.SetSkillEnabled(sk.ID, enabled); err != nil {

@@ -183,7 +183,9 @@ func (s *Server) setSkillEnabled(c *fiber.Ctx) error {
 	if !req.Enabled {
 		action = "disable"
 	}
-	s.store.InsertAuditLog(action, sk.Name, "")
+	if err := s.store.InsertAuditLog(action, sk.Name, ""); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
 
 	logger.Info("skill "+action+"d", "id", id, "name", sk.Name)
 	return c.JSON(fiber.Map{"ok": true})
