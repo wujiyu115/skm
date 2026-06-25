@@ -34,8 +34,8 @@ func TestNew_RunsMigrations(t *testing.T) {
 	if err != nil {
 		t.Fatalf("PRAGMA user_version error: %v", err)
 	}
-	if version != 3 {
-		t.Fatalf("expected user_version=3, got %d", version)
+	if version != 4 {
+		t.Fatalf("expected user_version=4, got %d", version)
 	}
 }
 
