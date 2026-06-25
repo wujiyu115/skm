@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Terminal, MousePointer, Code, ArrowLeft, CheckCircle, XCircle } from 'lucide-react'
 import { api, type Agent, type Skill } from '../lib/api'
+import { useI18n } from '../lib/i18n'
 
 const agentIcons: Record<string, typeof Terminal> = {
   claude: Terminal,
@@ -21,6 +22,7 @@ export default function AgentWorkspace() {
 }
 
 function AgentList() {
+  const { t } = useI18n()
   const [agents, setAgents] = useState<Agent[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
   const navigate = useNavigate()
@@ -36,7 +38,7 @@ function AgentList() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-6">Agent Workspaces</h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-6">{t('agents.title')}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {agents.map(a => {
           const Icon = agentIcons[a.name] ?? Terminal
@@ -58,12 +60,12 @@ function AgentList() {
                     {a.detected ? (
                       <>
                         <CheckCircle className="w-3.5 h-3.5 text-primary-500" />
-                        <span className="text-xs text-primary-600 font-medium">Active</span>
+                        <span className="text-xs text-primary-600 font-medium">{t('agents.active')}</span>
                       </>
                     ) : (
                       <>
                         <XCircle className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-xs text-slate-500">Not detected</span>
+                        <span className="text-xs text-slate-500">{t('agents.notDetected')}</span>
                       </>
                     )}
                   </div>
@@ -74,8 +76,8 @@ function AgentList() {
                 <div>Global: <code className="bg-slate-100 px-1.5 py-0.5 rounded">~/{a.global_dir}</code></div>
               </div>
               <div className="mt-3 flex items-center justify-between">
-                <span className="text-sm text-slate-500">{count} skills synced</span>
-                <span className="text-xs text-primary-600 font-medium">View →</span>
+                <span className="text-sm text-slate-500">{count} {t('agents.skillsSynced')}</span>
+                <span className="text-xs text-primary-600 font-medium">{t('agents.view')}</span>
               </div>
             </div>
           )
@@ -86,6 +88,7 @@ function AgentList() {
 }
 
 function AgentDetail({ name }: { name: string }) {
+  const { t } = useI18n()
   const [agent, setAgent] = useState<Agent | null>(null)
   const [skills, setSkills] = useState<Skill[]>([])
   const navigate = useNavigate()
@@ -111,7 +114,7 @@ function AgentDetail({ name }: { name: string }) {
         onClick={() => navigate('/agents')}
         className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-4"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Agents
+        <ArrowLeft className="w-4 h-4" /> {t('agents.back')}
       </button>
 
       <div className="flex items-center gap-3 mb-6">
@@ -122,19 +125,19 @@ function AgentDetail({ name }: { name: string }) {
           <h2 className="text-2xl font-bold text-slate-900">{agent.display_name}</h2>
           <div className="flex items-center gap-1.5">
             {agent.detected ? (
-              <><CheckCircle className="w-3.5 h-3.5 text-primary-500" /><span className="text-sm text-primary-600">Active</span></>
+              <><CheckCircle className="w-3.5 h-3.5 text-primary-500" /><span className="text-sm text-primary-600">{t('agents.active')}</span></>
             ) : (
-              <><XCircle className="w-3.5 h-3.5 text-slate-400" /><span className="text-sm text-slate-500">Not detected</span></>
+              <><XCircle className="w-3.5 h-3.5 text-slate-400" /><span className="text-sm text-slate-500">{t('agents.notDetected')}</span></>
             )}
           </div>
         </div>
       </div>
 
-      <h3 className="text-lg font-semibold text-slate-900 mb-3">Synced Skills ({skills.length})</h3>
+      <h3 className="text-lg font-semibold text-slate-900 mb-3">{t('agents.syncedSkills')} ({skills.length})</h3>
 
       {skills.length === 0 ? (
         <div className="text-center py-8 text-slate-500">
-          <p>No skills synced to this agent</p>
+          <p>{t('agents.noSkills')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -145,7 +148,7 @@ function AgentDetail({ name }: { name: string }) {
                 <span className="text-sm text-slate-500 ml-2">{sk.Description}</span>
               </div>
               <span className={`px-2 py-0.5 rounded text-xs font-medium ${sk.Enabled ? 'bg-primary-100 text-primary-700' : 'bg-slate-100 text-slate-500'}`}>
-                {sk.Enabled ? 'Enabled' : 'Disabled'}
+                {sk.Enabled ? t('skills.enabled') : t('skills.disabled')}
               </span>
             </div>
           ))}

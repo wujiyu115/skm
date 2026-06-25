@@ -1,5 +1,6 @@
 import { render, type RenderOptions } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { I18nProvider } from '../lib/i18n'
 import type { ReactElement } from 'react'
 
 export function renderWithRouter(
@@ -8,7 +9,9 @@ export function renderWithRouter(
 ) {
   return render(ui, {
     wrapper: ({ children }) => (
-      <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+      <I18nProvider>
+        <MemoryRouter initialEntries={[route]}>{children}</MemoryRouter>
+      </I18nProvider>
     ),
     ...options,
   })

@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, BookOpen, Download, Settings,
-  ChevronDown, ChevronRight, FolderOpen, Globe, Terminal, Code, MousePointer, Sparkles,
+  ChevronDown, ChevronRight, FolderOpen, Globe, Terminal, Code, MousePointer, Sparkles, Languages,
 } from 'lucide-react'
 import { api, type Group, type Agent, type Skill } from '../lib/api'
+import { useI18n } from '../lib/i18n'
 
 const agentIcons: Record<string, typeof Terminal> = {
   claude: Terminal,
@@ -12,20 +13,9 @@ const agentIcons: Record<string, typeof Terminal> = {
   codex: Code,
 }
 
-interface NavItem {
-  path: string
-  label: string
-  icon: typeof LayoutDashboard
-}
-
-const mainNav: NavItem[] = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/skills', label: 'Library', icon: BookOpen },
-  { path: '/install', label: 'Install Skills', icon: Download },
-]
-
 export default function Sidebar() {
   const location = useLocation()
+  const { t, locale, setLocale } = useI18n()
   const [groups, setGroups] = useState<Group[]>([])
   const [agents, setAgents] = useState<Agent[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
@@ -52,11 +42,17 @@ export default function Sidebar() {
   const agentSkillCount = (agentName: string) =>
     skills.filter(s => s.targets?.some(t => t.agent === agentName)).length
 
+  const mainNav = [
+    { path: '/', label: t('nav.dashboard'), icon: LayoutDashboard },
+    { path: '/skills', label: t('nav.library'), icon: BookOpen },
+    { path: '/install', label: t('nav.install'), icon: Download },
+  ]
+
   return (
     <nav className="w-64 bg-sidebar text-slate-300 flex flex-col h-screen" data-testid="sidebar">
       <div className="p-5 flex items-center gap-2 border-b border-slate-700">
         <Sparkles className="w-6 h-6 text-primary-400" />
-        <span className="font-bold text-white text-lg">Skills Manager</span>
+        <span className="font-bold text-white text-lg">{t('app.title')}</span>
       </div>
 
       <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
@@ -85,7 +81,7 @@ export default function Sidebar() {
           >
             {collapsed.presets ? <ChevronRight className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             <FolderOpen className="w-3 h-3" />
-            Presets
+            {t('nav.presets')}
           </button>
           {!collapsed.presets && (
             <div className="ml-4 space-y-0.5">
@@ -104,13 +100,15 @@ export default function Sidebar() {
                 </Link>
               ))}
               {groups.length === 0 && (
-                <div className="px-3 py-1.5 text-xs text-slate-500 italic">No groups</div>
+                <div className="px-3 py-1.5 text-xs text-slate-500 italic">
+                  {locale === 'zh' ? '暂无分组' : 'No groups'}
+                </div>
               )}
               <Link
                 to="/groups"
                 className="flex items-center px-3 py-1.5 text-xs text-slate-500 hover:text-slate-300"
               >
-                + New Group
+                {t('nav.newGroup')}
               </Link>
             </div>
           )}
@@ -123,7 +121,7 @@ export default function Sidebar() {
           >
             {collapsed.agents ? <ChevronRight className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             <Globe className="w-3 h-3" />
-            Global Workspace
+            {t('nav.workspace')}
           </button>
           {!collapsed.agents && (
             <div className="ml-4 space-y-0.5">
@@ -135,7 +133,7 @@ export default function Sidebar() {
                     : 'hover:bg-sidebar-hover'
                 }`}
               >
-                <span>All Agents</span>
+                <span>{t('nav.allAgents')}</span>
               </Link>
               {agents.map(a => {
                 const Icon = agentIcons[a.name] ?? Terminal
@@ -166,7 +164,14 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div className="p-3 border-t border-slate-700">
+      <div className="p-3 border-t border-slate-700 space-y-1">
+        <button
+          onClick={() => setLocale(locale === 'en' ? 'zh' : 'en')}
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full hover:bg-sidebar-hover transition-colors"
+        >
+          <Languages className="w-4 h-4" />
+          {locale === 'en' ? '中文' : 'English'}
+        </button>
         <Link
           to="/settings"
           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
@@ -176,7 +181,7 @@ export default function Sidebar() {
           }`}
         >
           <Settings className="w-4 h-4" />
-          Settings
+          {t('nav.settings')}
         </Link>
       </div>
     </nav>

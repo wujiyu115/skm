@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { FolderOpen, Plus, ArrowLeft, Trash2, X } from 'lucide-react'
 import { api, type Group, type Skill } from '../lib/api'
+import { useI18n } from '../lib/i18n'
 
 export default function Groups() {
   const { id } = useParams<{ id: string }>()
@@ -9,6 +10,7 @@ export default function Groups() {
 }
 
 function GroupList() {
+  const { t } = useI18n()
   const [groups, setGroups] = useState<Group[]>([])
   const [name, setName] = useState('')
   const [desc, setDesc] = useState('')
@@ -38,7 +40,7 @@ function GroupList() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-bold text-slate-900">Skill Groups</h2>
+          <h2 className="text-2xl font-bold text-slate-900">{t('groups.title')}</h2>
           <span className="px-2.5 py-0.5 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
             {groups.length}
           </span>
@@ -47,33 +49,33 @@ function GroupList() {
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
-          <Plus className="w-4 h-4" /> Create Group
+          <Plus className="w-4 h-4" /> {t('groups.create')}
         </button>
       </div>
 
       {showForm && (
         <div className="bg-white rounded-xl border border-slate-200 p-5 mb-6">
-          <h3 className="font-semibold text-slate-900 mb-3">New Group</h3>
+          <h3 className="font-semibold text-slate-900 mb-3">{t('groups.new')}</h3>
           <div className="space-y-3">
             <input
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="Group name"
+              placeholder={t('groups.name')}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               onKeyDown={e => e.key === 'Enter' && create()}
             />
             <input
               value={desc}
               onChange={e => setDesc(e.target.value)}
-              placeholder="Description (optional)"
+              placeholder={t('groups.desc')}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
             <div className="flex gap-2">
               <button onClick={create} className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700">
-                Create
+                {t('groups.create')}
               </button>
               <button onClick={() => setShowForm(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm">
-                Cancel
+                {t('groups.cancel')}
               </button>
             </div>
           </div>
@@ -83,8 +85,8 @@ function GroupList() {
       {groups.length === 0 ? (
         <div className="text-center py-12 text-slate-500">
           <FolderOpen className="w-12 h-12 mx-auto mb-3 text-slate-300" />
-          <p className="text-lg">No groups yet</p>
-          <p className="text-sm mt-1">Create a group to organize your skills</p>
+          <p className="text-lg">{t('groups.noGroups')}</p>
+          <p className="text-sm mt-1">{t('groups.noGroupsHint')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -110,7 +112,7 @@ function GroupList() {
                 <p className="text-sm text-slate-500 mt-2">{g.description}</p>
               )}
               <div className="mt-3">
-                <span className="text-xs text-slate-500">{g.skill_count ?? 0} skills</span>
+                <span className="text-xs text-slate-500">{g.skill_count ?? 0} {t('groups.skills')}</span>
               </div>
             </div>
           ))}
@@ -121,6 +123,7 @@ function GroupList() {
 }
 
 function GroupDetail({ id }: { id: string }) {
+  const { t } = useI18n()
   const [group, setGroup] = useState<Group | null>(null)
   const [skills, setSkills] = useState<Skill[]>([])
   const navigate = useNavigate()
@@ -146,14 +149,14 @@ function GroupDetail({ id }: { id: string }) {
         onClick={() => navigate('/groups')}
         className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 mb-4"
       >
-        <ArrowLeft className="w-4 h-4" /> Back to Groups
+        <ArrowLeft className="w-4 h-4" /> {t('groups.back')}
       </button>
 
       <div className="flex items-center gap-3 mb-6">
         <FolderOpen className="w-6 h-6 text-purple-500" />
         <h2 className="text-2xl font-bold text-slate-900">{group.name}</h2>
         <span className="px-2.5 py-0.5 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-          {skills.length} skills
+          {skills.length} {t('groups.skills')}
         </span>
       </div>
 
@@ -163,8 +166,8 @@ function GroupDetail({ id }: { id: string }) {
 
       {skills.length === 0 ? (
         <div className="text-center py-12 text-slate-500">
-          <p>No skills in this group</p>
-          <p className="text-sm mt-1">Add skills using the CLI: skm group add {group.name} &lt;skill&gt;</p>
+          <p>{t('groups.noSkillsInGroup')}</p>
+          <p className="text-sm mt-1">{t('groups.addHint')} {group.name} &lt;skill&gt;</p>
         </div>
       ) : (
         <div className="space-y-2">

@@ -1,5 +1,6 @@
 import { GitBranch, FolderOpen, Trash2, RefreshCw } from 'lucide-react'
 import type { Skill } from '../lib/api'
+import { useI18n } from '../lib/i18n'
 
 interface SkillCardProps {
   skill: Skill
@@ -16,6 +17,7 @@ const agentColors: Record<string, string> = {
 }
 
 export default function SkillCard({ skill, onRemove, onSync, selected, onSelect }: SkillCardProps) {
+  const { t } = useI18n()
   const sourceIcon = skill.SourceType === 'git'
     ? <GitBranch className="w-3 h-3" />
     : <FolderOpen className="w-3 h-3" />
@@ -39,7 +41,7 @@ export default function SkillCard({ skill, onRemove, onSync, selected, onSelect 
             ? 'bg-primary-100 text-primary-700'
             : 'bg-slate-100 text-slate-500'
         }`}>
-          {skill.Enabled ? 'Enabled' : 'Disabled'}
+          {skill.Enabled ? t('skills.enabled') : t('skills.disabled')}
         </span>
       </div>
 
@@ -51,7 +53,7 @@ export default function SkillCard({ skill, onRemove, onSync, selected, onSelect 
             onClick={() => onSync(skill.ID)}
             className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
           >
-            <RefreshCw className="w-3 h-3" /> sync
+            <RefreshCw className="w-3 h-3" /> {t('skills.sync')}
           </button>
         )}
         {onRemove && (
@@ -59,7 +61,7 @@ export default function SkillCard({ skill, onRemove, onSync, selected, onSelect 
             onClick={() => onRemove(skill.ID)}
             className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1"
           >
-            <Trash2 className="w-3 h-3" /> remove
+            <Trash2 className="w-3 h-3" /> {t('skills.remove')}
           </button>
         )}
       </div>

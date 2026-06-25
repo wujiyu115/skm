@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react'
 import { Settings as SettingsIcon, FolderOpen, Database, HardDrive } from 'lucide-react'
 import { api } from '../lib/api'
+import { useI18n } from '../lib/i18n'
 
 export default function Settings() {
+  const { t } = useI18n()
   const [settings, setSettings] = useState<Record<string, string>>({})
   useEffect(() => { api.settings.get().then(setSettings).catch(() => {}) }, [])
 
   const sections = [
     {
-      title: 'Storage',
+      title: t('settings.storage'),
       icon: Database,
       items: Object.entries(settings).filter(([k]) => k.includes('dir') || k.includes('path')),
     },
     {
-      title: 'Other',
+      title: t('settings.other'),
       icon: HardDrive,
       items: Object.entries(settings).filter(([k]) => !k.includes('dir') && !k.includes('path')),
     },
@@ -23,13 +25,13 @@ export default function Settings() {
     <div>
       <div className="flex items-center gap-3 mb-6">
         <SettingsIcon className="w-6 h-6 text-slate-400" />
-        <h2 className="text-2xl font-bold text-slate-900">Settings</h2>
+        <h2 className="text-2xl font-bold text-slate-900">{t('settings.title')}</h2>
       </div>
 
       {sections.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 max-w-lg">
           <FolderOpen className="w-10 h-10 mx-auto mb-3 text-slate-300" />
-          <p>No settings configured</p>
+          <p>{t('settings.noSettings')}</p>
         </div>
       ) : (
         <div className="space-y-6 max-w-2xl">
