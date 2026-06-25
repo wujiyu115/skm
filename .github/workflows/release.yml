@@ -28,10 +28,7 @@ jobs:
         run: |
           cd web
           npm ci
-          npm run build
-
-      - name: Copy dist to embed location
-        run: cp -r web/dist internal/server/dist
+          npm run build -- --outDir ../internal/server/dist --emptyOutDir
 
       - uses: goreleaser/goreleaser-action@v6
         with:
