@@ -25,6 +25,7 @@ func (s *Server) registerSkillRoutes(api fiber.Router) {
 	api.Get("/skills/:id/content", s.getSkillContent)
 	api.Put("/skills/:id/enable", s.setSkillEnabled)
 	api.Post("/skills/:id/sync", s.syncSkill)
+	api.Post("/skills/:id/unsync", s.unsyncSkill)
 }
 
 func (s *Server) listSkills(c *fiber.Ctx) error {
@@ -230,6 +231,47 @@ func (s *Server) syncSkill(c *fiber.Ctx) error {
 		agentNames[i] = ag.Name
 	}
 	if err := s.store.InsertAuditLog("sync", sk.Name, strings.Join(agentNames, ",")); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
+
+	return c.JSON(fiber.Map{"ok": true})
+}
+
+func (s *Server) unsyncSkill(c *fiber.Ctx) error {
+	sk, err := s.store.GetSkillByID(c.Params("id"))
+	if err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	var req struct {
+		Agent  string `json:"agent"`
+		Global bool   `json:"global"`
+	}
+	if err := c.BodyParser(&req); err != nil || req.Agent == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "agent is required"})
+	}
+
+	ag, ok := agent.Find(req.Agent)
+	if !ok {
+		return c.Status(400).JSON(fiber.Map{"error": fmt.Sprintf("unknown agent: %s", req.Agent)})
+	}
+
+	cwd, _ := os.Getwd()
+	targetDir, err := agent.InstallPath(ag, req.Global, cwd)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("install path: %v", err)})
+	}
+	targetPath := filepath.Join(targetDir, sk.Name)
+
+	if err := skmsync.Unsync(targetPath); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("unsync: %v", err)})
+	}
+
+	if err := s.store.DeleteTarget(sk.ID, ag.Name); err != nil {
+		logger.Warn("delete target record failed", "err", err)
+	}
+
+	if err := s.store.InsertAuditLog("unsync", sk.Name, req.Agent); err != nil {
 		logger.Warn("audit log failed", "err", err)
 	}
 

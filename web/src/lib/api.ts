@@ -79,10 +79,15 @@ export const api = {
         body: JSON.stringify({ enabled }),
       }),
     content: (id: string) => request<{ content: string }>(`/skills/${id}/content`),
-    sync: (id: string, agents: string[]) =>
+    sync: (id: string, agents: string[], global = true) =>
       request(`/skills/${id}/sync`, {
         method: 'POST',
-        body: JSON.stringify({ agents }),
+        body: JSON.stringify({ agents, global }),
+      }),
+    unsync: (id: string, agent: string, global = true) =>
+      request(`/skills/${id}/unsync`, {
+        method: 'POST',
+        body: JSON.stringify({ agent, global }),
       }),
   },
   groups: {
@@ -139,7 +144,7 @@ export const api = {
     trigger: (agents: string[]) =>
       request('/sync', {
         method: 'POST',
-        body: JSON.stringify({ agents }),
+        body: JSON.stringify({ agents, global: true }),
       }),
   },
   batch: {
@@ -161,7 +166,7 @@ export const api = {
     sync: (ids: string[], agents: string[]) =>
       request<{ ok: boolean; processed: number; errors: string[] }>('/skills/batch/sync', {
         method: 'POST',
-        body: JSON.stringify({ ids, agents }),
+        body: JSON.stringify({ ids, agents, global: true }),
       }),
   },
   tags: {

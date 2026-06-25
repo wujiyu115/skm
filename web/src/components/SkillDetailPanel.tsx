@@ -46,8 +46,8 @@ export default function SkillDetailPanel({ skillId, onClose }: SkillDetailPanelP
         setContent(contentRes.content ?? '')
         setTags(tagsRes)
       })
-      .catch(() => {
-        toast.error(t('toast.error'))
+      .catch((err: Error) => {
+        toast.error(err.message || t('toast.error'))
       })
       .finally(() => setLoading(false))
   }, [skillId, t])
@@ -58,8 +58,8 @@ export default function SkillDetailPanel({ skillId, onClose }: SkillDetailPanelP
       await api.skills.setEnabled(skill.ID, !skill.Enabled)
       setSkill({ ...skill, Enabled: !skill.Enabled })
       toast.success(t(skill.Enabled ? 'toast.skillDisabled' : 'toast.skillEnabled'))
-    } catch {
-      toast.error(t('toast.error'))
+    } catch (err: any) {
+      toast.error(err?.message || t('toast.error'))
     }
   }
 

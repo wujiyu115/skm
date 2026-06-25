@@ -10,6 +10,9 @@ import (
 	"github.com/ejoy/skm/internal/store"
 )
 
+// DebugMode is set by commands that support --debug to enable verbose logging.
+var DebugMode bool
+
 type Config struct {
 	HomeDir   string
 	DBPath    string
@@ -38,7 +41,7 @@ func NewConfig() (*Config, error) {
 	os.MkdirAll(cfg.SkillsDir, 0755)
 	os.MkdirAll(cfg.CacheDir, 0755)
 
-	if err := logger.Setup(logger.Config{Dir: logDir, MaxSizeMB: 10, MaxBackups: 5, MaxAgeDays: 30}); err != nil {
+	if err := logger.Setup(logger.Config{Dir: logDir, MaxSizeMB: 10, MaxBackups: 5, MaxAgeDays: 30, Debug: DebugMode}); err != nil {
 		fmt.Fprintf(os.Stderr, "warning: setup logger: %v\n", err)
 	}
 

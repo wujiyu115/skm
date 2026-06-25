@@ -24,6 +24,7 @@ func newServeCmd() *cobra.Command {
 		Use:   "serve",
 		Short: "Start the web UI",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			DebugMode = debug
 			cfg, err := NewConfig()
 			if err != nil {
 				return err

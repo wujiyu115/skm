@@ -20,6 +20,7 @@ type Config struct {
 	MaxSizeMB  int
 	MaxBackups int
 	MaxAgeDays int
+	Debug      bool
 }
 
 func Setup(cfg Config) error {
@@ -48,9 +49,14 @@ func Setup(cfg Config) error {
 		LocalTime:  true,
 	}
 
+	level := slog.LevelInfo
+	if cfg.Debug {
+		level = slog.LevelDebug
+	}
+
 	w := io.MultiWriter(os.Stderr, lj)
 	defaultLogger = slog.New(slog.NewJSONHandler(w, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: level,
 	}))
 	slog.SetDefault(defaultLogger)
 

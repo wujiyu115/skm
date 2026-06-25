@@ -5,6 +5,20 @@ import SkillCard from '../SkillCard'
 import { mockSkill, mockTarget } from '../../test/mocks'
 import { renderWithRouter } from '../../test/utils'
 
+vi.mock('../../lib/api', () => ({
+  api: {
+    skills: {
+      sync: vi.fn().mockResolvedValue({}),
+      unsync: vi.fn().mockResolvedValue({}),
+    },
+  },
+}))
+
+const detectedAgents = [
+  { name: 'claude', display_name: 'Claude Code', detected: true, global_dir: '.claude/skills', project_dir: '.claude/skills', detect_paths: ['.claude'], is_builtin: true, category: 'coding' },
+  { name: 'cursor', display_name: 'Cursor', detected: true, global_dir: '.cursor/skills', project_dir: '.cursor/skills', detect_paths: ['.cursor'], is_builtin: true, category: 'coding' },
+]
+
 describe('SkillCard', () => {
   it('renders skill name and description', () => {
     renderWithRouter(<SkillCard skill={mockSkill()} />)
@@ -27,13 +41,13 @@ describe('SkillCard', () => {
     expect(screen.getByText('git')).toBeInTheDocument()
   })
 
-  it('shows agent badges for targets', () => {
+  it('shows agent badges with synced styling for targets', () => {
     const skill = mockSkill({
-      targets: [mockTarget({ agent: 'claude' }), mockTarget({ agent: 'cursor' })],
+      targets: [mockTarget({ agent: 'claude' })],
     })
-    renderWithRouter(<SkillCard skill={skill} />)
-    expect(screen.getByText('claude')).toBeInTheDocument()
-    expect(screen.getByText('cursor')).toBeInTheDocument()
+    renderWithRouter(<SkillCard skill={skill} detectedAgents={detectedAgents} />)
+    expect(screen.getByText('Claude Code')).toBeInTheDocument()
+    expect(screen.getByText('Cursor')).toBeInTheDocument()
   })
 
   it('calls onRemove when remove clicked', async () => {
@@ -41,13 +55,6 @@ describe('SkillCard', () => {
     renderWithRouter(<SkillCard skill={mockSkill()} onRemove={onRemove} />)
     await userEvent.click(screen.getByText('remove'))
     expect(onRemove).toHaveBeenCalledWith('skill-1')
-  })
-
-  it('calls onSync when sync clicked', async () => {
-    const onSync = vi.fn()
-    renderWithRouter(<SkillCard skill={mockSkill()} onSync={onSync} />)
-    await userEvent.click(screen.getByText('Sync'))
-    expect(onSync).toHaveBeenCalledWith('skill-1')
   })
 
   it('calls onToggleEnabled with toggled value when badge is clicked', async () => {
@@ -89,7 +96,6 @@ describe('SkillCard', () => {
 
   it('does not render tag section when tags is undefined', () => {
     renderWithRouter(<SkillCard skill={mockSkill()} />)
-    // Should render without errors, no tag pills visible
     expect(screen.getByText('test-skill')).toBeInTheDocument()
   })
 })

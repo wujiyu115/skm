@@ -21,6 +21,7 @@ export default function Sidebar() {
   const [agents, setAgents] = useState<Agent[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
   const [projects, setProjects] = useState<Project[]>([])
+  const [agentSkillCounts, setAgentSkillCounts] = useState<Record<string, number>>({})
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
@@ -34,6 +35,14 @@ export default function Sidebar() {
       setAgents(a ?? [])
       setSkills(s ?? [])
       setProjects(p ?? [])
+      const detected = (a ?? []).filter((ag: Agent) => ag.detected)
+      Promise.all(
+        detected.map((ag: Agent) => api.agents.skills(ag.name).then(sk => ({ name: ag.name, count: (sk ?? []).length })).catch(() => ({ name: ag.name, count: 0 })))
+      ).then(counts => {
+        const map: Record<string, number> = {}
+        counts.forEach(c => { map[c.name] = c.count })
+        setAgentSkillCounts(map)
+      })
     }).catch(() => {})
   }, [location.pathname])
 
@@ -44,7 +53,7 @@ export default function Sidebar() {
   const isActive = (path: string) => location.pathname === path
 
   const agentSkillCount = (agentName: string) =>
-    skills.filter(s => s.targets?.some(t => t.agent === agentName)).length
+    agentSkillCounts[agentName] ?? 0
 
   const mainNav = [
     { path: '/', label: t('nav.dashboard'), icon: LayoutDashboard },

@@ -15,6 +15,7 @@ vi.mock('../../lib/api', () => ({
       install: vi.fn().mockResolvedValue({ installed: ['test'] }),
       remove: vi.fn().mockResolvedValue({}),
       sync: vi.fn().mockResolvedValue({}),
+      unsync: vi.fn().mockResolvedValue({}),
     },
     tags: {
       list: vi.fn().mockResolvedValue(['frontend', 'backend']),
@@ -26,6 +27,11 @@ vi.mock('../../lib/api', () => ({
         }
         return Promise.resolve(map[id] ?? [])
       }),
+    },
+    agents: {
+      list: vi.fn().mockResolvedValue([
+        { name: 'claude', display_name: 'Claude Code', detected: true, global_dir: '.claude/skills' },
+      ]),
     },
     sync: { trigger: vi.fn().mockResolvedValue({}) },
   },

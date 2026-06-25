@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Search, LayoutGrid, List, RefreshCw, CheckSquare, Download } from 'lucide-react'
-import { api, type Skill } from '../lib/api'
+import { api, type Skill, type Agent } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 import { toast } from '../lib/toast'
 import SkillCard from '../components/SkillCard'
@@ -23,6 +23,13 @@ export default function SkillsLibrary() {
   const [source, setSource] = useState('')
   const [installing, setInstalling] = useState(false)
   const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null)
+  const [detectedAgents, setDetectedAgents] = useState<Agent[]>([])
+
+  useEffect(() => {
+    api.agents.list().then(agents => {
+      setDetectedAgents((agents ?? []).filter(a => a.detected))
+    }).catch(() => {})
+  }, [])
 
   const load = () => {
     api.skills.list().then(loadedSkills => {
@@ -102,9 +109,17 @@ export default function SkillsLibrary() {
 
   const syncAll = async () => {
     try {
-      await api.sync.trigger([])
+      const results = await api.sync.trigger([])
+      const errors = (results as any[])?.filter((r: any) => r.status === 'error')
+      if (errors?.length) {
+        toast.error(errors.map((e: any) => `${e.skill}@${e.agent}: ${e.detail || 'failed'}`).join('; '))
+      } else {
+        toast.success(t('toast.synced'))
+      }
       load()
-    } catch { /* ignore */ }
+    } catch (err: any) {
+      toast.error(err?.message || t('toast.error'))
+    }
   }
 
   const removeSkill = async (id: string) => {
@@ -124,7 +139,7 @@ export default function SkillsLibrary() {
     }
   }
 
-  const handleBatchAction = async (action: string) => {
+  const handleBatchAction = async (action: string, agent?: string) => {
     const ids = Array.from(selectedSkills)
     try {
       switch (action) {
@@ -141,7 +156,7 @@ export default function SkillsLibrary() {
           toast.success(t('toast.batchDone'))
           break
         case 'sync':
-          await api.batch.sync(ids, [])
+          await api.batch.sync(ids, agent ? [agent] : [])
           toast.success(t('toast.batchDone'))
           break
       }
@@ -263,11 +278,12 @@ export default function SkillsLibrary() {
               key={sk.ID}
               skill={sk}
               tags={skillTags[sk.ID]}
+              detectedAgents={detectedAgents}
               selected={selectedSkills.has(sk.ID)}
               onSelect={toggleSelect}
               onRemove={removeSkill}
-              onSync={id => api.skills.sync(id, []).then(load)}
               onToggleEnabled={handleToggleEnabled}
+              onSyncChange={load}
               onClick={setSelectedSkillId}
             />
           ))}
@@ -281,6 +297,7 @@ export default function SkillsLibrary() {
 
       <BatchToolbar
         selectedIds={Array.from(selectedSkills)}
+        detectedAgents={detectedAgents}
         onClear={() => setSelectedSkills(new Set())}
         onAction={handleBatchAction}
       />

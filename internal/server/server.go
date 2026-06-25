@@ -48,8 +48,8 @@ func New(cfg *ServerConfig) *Server {
 	}
 
 	api := app.Group("/api")
-	s.registerSkillRoutes(api)
 	s.registerBatchRoutes(api)
+	s.registerSkillRoutes(api)
 	s.registerTagRoutes(api)
 	s.registerGroupRoutes(api)
 	s.registerAgentRoutes(api)
