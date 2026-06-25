@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Settings as SettingsIcon, Palette, RefreshCw, Info, FolderOpen } from 'lucide-react'
+import { Settings as SettingsIcon, Palette, RefreshCw, Info } from 'lucide-react'
 import { api } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 import { useTheme } from '../lib/theme'
@@ -113,7 +113,7 @@ export default function Settings() {
             <SelectField
               label={t('settings.theme')}
               value={themeValue}
-              onChange={handleThemeChange}
+              onChange={(v) => handleThemeChange(v as ThemeOption)}
               options={[
                 { value: 'light', label: 'Light' },
                 { value: 'dark', label: 'Dark' },
