@@ -137,5 +137,7 @@ export const api = {
   },
   settings: {
     get: () => request<Record<string, string>>('/settings'),
+    update: (settings: Record<string, string>) =>
+      request('/settings', { method: 'PUT', body: JSON.stringify(settings) }),
   },
 }
