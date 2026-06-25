@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Download, Search, FolderOpen, GitBranch, ChevronDown, ChevronUp, Check, Package } from 'lucide-react'
 import { api } from '../lib/api'
 import { useI18n } from '../lib/i18n'
+import { toast } from '../lib/toast'
 
 type Tab = 'registry' | 'local' | 'git'
 type Filter = 'all' | 'official' | 'community'
@@ -70,7 +71,6 @@ export default function Install() {
   const [sourceFilter, setSourceFilter] = useState('')
   const [installing, setInstalling] = useState<string | null>(null)
   const [installed, setInstalled] = useState<Set<string>>(new Set())
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const [localPath, setLocalPath] = useState('')
   const [gitUrl, setGitUrl] = useState('')
@@ -88,13 +88,12 @@ export default function Install() {
   const doInstall = async (source: string, key?: string) => {
     const installKey = key ?? source
     setInstalling(installKey)
-    setMessage(null)
     try {
       await api.skills.install(source, [], globalInstall)
       setInstalled(prev => new Set(prev).add(installKey))
-      setMessage({ type: 'success', text: t('install.success') })
+      toast.success(t('install.success'))
     } catch {
-      setMessage({ type: 'error', text: t('install.error') })
+      toast.error(t('install.error'))
     } finally {
       setInstalling(null)
     }
@@ -118,14 +117,6 @@ export default function Install() {
         <Download className="w-6 h-6 text-primary-600" />
         <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('install.title')}</h2>
       </div>
-
-      {message && (
-        <div className={`mb-4 px-4 py-3 rounded-lg text-sm font-medium ${
-          message.type === 'success' ? 'bg-primary-50 text-primary-700 border border-primary-200' : 'bg-red-50 text-red-700 border border-red-200'
-        }`}>
-          {message.text}
-        </div>
-      )}
 
       <div className="flex items-center gap-1 mb-6 border-b border-slate-200 dark:border-slate-700">
         {tabs.map(t => {

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import { I18nProvider } from './lib/i18n'
 import { ThemeProvider } from './lib/theme'
 import App from './App'
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')!).render(
       <ThemeProvider>
         <I18nProvider>
           <App />
+          <Toaster richColors position="top-right" />
         </I18nProvider>
       </ThemeProvider>
     </BrowserRouter>

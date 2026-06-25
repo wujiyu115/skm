@@ -95,6 +95,88 @@ const translations = {
     'install.global': 'Install Globally',
     'install.success': 'Skills installed successfully!',
     'install.error': 'Installation failed',
+
+    // Tags
+    'tags.title': 'Tags',
+    'tags.add': 'Add Tag',
+    'tags.remove': 'Remove',
+    'tags.rename': 'Rename Tag',
+    'tags.delete': 'Delete Tag',
+    'tags.search': 'Search tags...',
+    'tags.noTags': 'No tags',
+    'tags.untagged': 'Untagged',
+    'tags.placeholder': 'Enter tag name...',
+
+    // Skill detail
+    'detail.title': 'Skill Details',
+    'detail.content': 'Content',
+    'detail.source': 'Source',
+    'detail.metadata': 'Metadata',
+    'detail.sourceType': 'Source Type',
+    'detail.sourceRef': 'Source Ref',
+    'detail.enabled': 'Enabled',
+    'detail.disabled': 'Disabled',
+    'detail.close': 'Close',
+    'detail.tags': 'Tags',
+    'detail.agents': 'Synced Agents',
+    'detail.noContent': 'No content available',
+
+    // Audit
+    'audit.title': 'Audit Log',
+    'audit.action': 'Action',
+    'audit.target': 'Target',
+    'audit.detail': 'Detail',
+    'audit.time': 'Time',
+    'audit.prune': 'Prune Old Entries',
+    'audit.noEntries': 'No audit entries',
+    'audit.pruned': 'Old entries pruned',
+
+    // Settings (expanded)
+    'settings.agents': 'Agent Management',
+    'settings.agentToggle': 'Toggle agent',
+    'settings.syncMode': 'Sync Mode',
+    'settings.symlink': 'Symlink',
+    'settings.copy': 'Copy',
+    'settings.appearance': 'Appearance',
+    'settings.theme': 'Theme',
+    'settings.language': 'Language',
+    'settings.textSize': 'Text Size',
+    'settings.updates': 'Updates',
+    'settings.autoUpdate': 'Auto Update Interval',
+    'settings.about': 'About',
+    'settings.version': 'Version',
+    'settings.saved': 'Settings saved',
+
+    // Toast
+    'toast.skillEnabled': 'Skill enabled',
+    'toast.skillDisabled': 'Skill disabled',
+    'toast.tagAdded': 'Tag added',
+    'toast.tagRemoved': 'Tag removed',
+    'toast.error': 'Operation failed',
+    'toast.synced': 'Sync complete',
+    'toast.deleted': 'Deleted successfully',
+    'toast.copied': 'Copied to clipboard',
+
+    // Batch
+    'batch.selected': 'selected',
+    'batch.delete': 'Delete Selected',
+    'batch.enable': 'Enable Selected',
+    'batch.disable': 'Disable Selected',
+    'batch.tag': 'Tag Selected',
+    'batch.sync': 'Sync Selected',
+    'batch.confirm': 'Are you sure?',
+    'batch.cancel': 'Cancel',
+
+    // Search / Command Palette
+    'search.placeholder': 'Search skills, groups, pages...',
+    'search.noResults': 'No results found',
+    'search.skills': 'Skills',
+    'search.groups': 'Groups',
+    'search.pages': 'Pages',
+    'search.hint': '⌘K to search',
+
+    // Nav additions
+    'nav.audit': 'Audit Log',
   },
   zh: {
     'app.title': '技能管理器',
@@ -188,6 +270,88 @@ const translations = {
     'install.global': '全局安装',
     'install.success': '技能安装成功！',
     'install.error': '安装失败',
+
+    // Tags
+    'tags.title': '标签',
+    'tags.add': '添加标签',
+    'tags.remove': '移除',
+    'tags.rename': '重命名标签',
+    'tags.delete': '删除标签',
+    'tags.search': '搜索标签...',
+    'tags.noTags': '暂无标签',
+    'tags.untagged': '未标记',
+    'tags.placeholder': '输入标签名...',
+
+    // Skill detail
+    'detail.title': '技能详情',
+    'detail.content': '内容',
+    'detail.source': '来源',
+    'detail.metadata': '元数据',
+    'detail.sourceType': '来源类型',
+    'detail.sourceRef': '来源引用',
+    'detail.enabled': '已启用',
+    'detail.disabled': '已禁用',
+    'detail.close': '关闭',
+    'detail.tags': '标签',
+    'detail.agents': '已同步智能体',
+    'detail.noContent': '暂无内容',
+
+    // Audit
+    'audit.title': '操作日志',
+    'audit.action': '操作',
+    'audit.target': '目标',
+    'audit.detail': '详情',
+    'audit.time': '时间',
+    'audit.prune': '清理旧记录',
+    'audit.noEntries': '暂无操作记录',
+    'audit.pruned': '旧记录已清理',
+
+    // Settings (expanded)
+    'settings.agents': '智能体管理',
+    'settings.agentToggle': '切换智能体',
+    'settings.syncMode': '同步模式',
+    'settings.symlink': '符号链接',
+    'settings.copy': '复制',
+    'settings.appearance': '外观',
+    'settings.theme': '主题',
+    'settings.language': '语言',
+    'settings.textSize': '字体大小',
+    'settings.updates': '更新',
+    'settings.autoUpdate': '自动更新间隔',
+    'settings.about': '关于',
+    'settings.version': '版本',
+    'settings.saved': '设置已保存',
+
+    // Toast
+    'toast.skillEnabled': '技能已启用',
+    'toast.skillDisabled': '技能已禁用',
+    'toast.tagAdded': '标签已添加',
+    'toast.tagRemoved': '标签已移除',
+    'toast.error': '操作失败',
+    'toast.synced': '同步完成',
+    'toast.deleted': '删除成功',
+    'toast.copied': '已复制到剪贴板',
+
+    // Batch
+    'batch.selected': '已选中',
+    'batch.delete': '删除选中',
+    'batch.enable': '启用选中',
+    'batch.disable': '禁用选中',
+    'batch.tag': '标记选中',
+    'batch.sync': '同步选中',
+    'batch.confirm': '确定要执行此操作吗？',
+    'batch.cancel': '取消',
+
+    // Search / Command Palette
+    'search.placeholder': '搜索技能、分组、页面...',
+    'search.noResults': '未找到结果',
+    'search.skills': '技能',
+    'search.groups': '分组',
+    'search.pages': '页面',
+    'search.hint': '⌘K 搜索',
+
+    // Nav additions
+    'nav.audit': '操作日志',
   },
 } as const
 
