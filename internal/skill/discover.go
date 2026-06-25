@@ -1,6 +1,7 @@
 package skill
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -23,17 +24,23 @@ const maxRecurseDepth = 5
 func Discover(baseDir string, subpath string) ([]*Skill, error) {
 	searchDir := baseDir
 	if subpath != "" {
+		found := false
 		candidate := filepath.Join(baseDir, subpath)
 		if info, err := os.Stat(candidate); err == nil && info.IsDir() {
 			searchDir = candidate
+			found = true
 		} else {
 			for _, pd := range priorityDirs {
 				alt := filepath.Join(baseDir, pd, subpath)
 				if info, err := os.Stat(alt); err == nil && info.IsDir() {
 					searchDir = alt
+					found = true
 					break
 				}
 			}
+		}
+		if !found {
+			return nil, fmt.Errorf("subpath %q not found in repository", subpath)
 		}
 	}
 
