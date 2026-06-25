@@ -56,6 +56,7 @@ func New(cfg *ServerConfig) *Server {
 	s.registerSyncRoutes(api)
 	s.registerSettingRoutes(api)
 	s.registerAuditRoutes(api)
+	s.registerProjectRoutes(api)
 
 	// Serve embedded web UI in production mode.
 	// In dev mode (SKM_DEV=1), skip this so Vite HMR works via proxy.

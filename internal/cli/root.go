@@ -32,6 +32,7 @@ func NewRoot() *cobra.Command {
 		newSearchCmd(),
 		newExportCmd(),
 		newInfoCmd(),
+		newProjectCmd(),
 	)
 
 	return root
