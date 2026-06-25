@@ -140,4 +140,11 @@ export const api = {
     update: (settings: Record<string, string>) =>
       request('/settings', { method: 'PUT', body: JSON.stringify(settings) }),
   },
+  audit: {
+    list: (limit = 100) =>
+      request<Array<{ id: number; action: string; target: string; detail: string; created_at: string }>>(
+        `/audit?limit=${limit}`,
+      ).then(r => r ?? []),
+    prune: () => request<{ ok: boolean; pruned: boolean }>('/audit', { method: 'DELETE' }),
+  },
 }
