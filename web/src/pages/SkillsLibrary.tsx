@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n'
 import { toast } from '../lib/toast'
 import SkillCard from '../components/SkillCard'
 import TagFilter from '../components/TagFilter'
+import SkillDetailPanel from '../components/SkillDetailPanel'
 
 type Tab = 'all' | 'enabled' | 'available'
 
@@ -20,6 +21,7 @@ export default function SkillsLibrary() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [source, setSource] = useState('')
   const [installing, setInstalling] = useState(false)
+  const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null)
 
   const load = () => {
     api.skills.list().then(loadedSkills => {
@@ -237,10 +239,16 @@ export default function SkillsLibrary() {
               onRemove={removeSkill}
               onSync={id => api.skills.sync(id, []).then(load)}
               onToggleEnabled={handleToggleEnabled}
+              onClick={setSelectedSkillId}
             />
           ))}
         </div>
       )}
+
+      <SkillDetailPanel
+        skillId={selectedSkillId}
+        onClose={() => setSelectedSkillId(null)}
+      />
     </div>
   )
 }

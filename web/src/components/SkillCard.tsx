@@ -11,6 +11,7 @@ interface SkillCardProps {
   onToggleEnabled?: (id: string, enabled: boolean) => void
   selected?: boolean
   onSelect?: (id: string) => void
+  onClick?: (id: string) => void
 }
 
 const agentColors: Record<string, string> = {
@@ -19,14 +20,18 @@ const agentColors: Record<string, string> = {
   codex: 'bg-purple-100 text-purple-700',
 }
 
-export default function SkillCard({ skill, tags, onRemove, onSync, onToggleEnabled, selected, onSelect }: SkillCardProps) {
+export default function SkillCard({ skill, tags, onRemove, onSync, onToggleEnabled, selected, onSelect, onClick }: SkillCardProps) {
   const { t } = useI18n()
   const sourceIcon = skill.SourceType === 'git'
     ? <GitBranch className="w-3 h-3" />
     : <FolderOpen className="w-3 h-3" />
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 hover:shadow-md transition-shadow">
+    <div
+      className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 hover:shadow-md transition-shadow cursor-pointer"
+      onClick={() => onClick?.(skill.ID)}
+      data-testid="skill-card"
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
           {onSelect && (
@@ -34,6 +39,7 @@ export default function SkillCard({ skill, tags, onRemove, onSync, onToggleEnabl
               type="checkbox"
               checked={selected}
               onChange={() => onSelect(skill.ID)}
+              onClick={e => e.stopPropagation()}
               className="rounded border-slate-300"
             />
           )}
@@ -41,7 +47,7 @@ export default function SkillCard({ skill, tags, onRemove, onSync, onToggleEnabl
         </div>
         <button
           type="button"
-          onClick={() => onToggleEnabled?.(skill.ID, !skill.Enabled)}
+          onClick={e => { e.stopPropagation(); onToggleEnabled?.(skill.ID, !skill.Enabled) }}
           className={`px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer transition-colors ${
             skill.Enabled
               ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-800'
@@ -70,7 +76,7 @@ export default function SkillCard({ skill, tags, onRemove, onSync, onToggleEnabl
       <div className="flex items-center gap-2 mt-3">
         {onSync && (
           <button
-            onClick={() => onSync(skill.ID)}
+            onClick={e => { e.stopPropagation(); onSync(skill.ID) }}
             className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
           >
             <RefreshCw className="w-3 h-3" /> {t('skills.sync')}
@@ -78,7 +84,7 @@ export default function SkillCard({ skill, tags, onRemove, onSync, onToggleEnabl
         )}
         {onRemove && (
           <button
-            onClick={() => onRemove(skill.ID)}
+            onClick={e => { e.stopPropagation(); onRemove(skill.ID) }}
             className="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1"
           >
             <Trash2 className="w-3 h-3" /> {t('skills.remove')}
