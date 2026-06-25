@@ -48,7 +48,7 @@ export interface Agent {
 
 export const api = {
   skills: {
-    list: () => request<Skill[]>('/skills'),
+    list: () => request<Skill[]>('/skills').then(r => r ?? []),
     get: (id: string) => request<{ skill: Skill; targets: Target[] }>(`/skills/${id}`),
     install: (source: string, agents: string[], global: boolean) =>
       request<{ installed: string[] }>('/skills/install', {
@@ -64,7 +64,7 @@ export const api = {
       }),
   },
   groups: {
-    list: () => request<Group[]>('/groups'),
+    list: () => request<Group[]>('/groups').then(r => r ?? []),
     get: (id: string) => request<{ group: Group; skills: Skill[] }>(`/groups/${id}`),
     create: (name: string, description: string) =>
       request<{ id: string }>('/groups', {
@@ -91,7 +91,7 @@ export const api = {
       }),
   },
   agents: {
-    list: () => request<Agent[]>('/agents'),
+    list: () => request<Agent[]>('/agents').then(r => r ?? []),
   },
   sync: {
     status: () => request<{ total: number; synced: number; stale: number }>('/sync/status'),

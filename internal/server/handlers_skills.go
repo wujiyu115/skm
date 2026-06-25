@@ -35,7 +35,7 @@ func (s *Server) listSkills(c *fiber.Ctx) error {
 		Targets []store.Target `json:"targets"`
 	}
 
-	var result []skillWithTargets
+	result := make([]skillWithTargets, 0, len(skills))
 	for _, sk := range skills {
 		targets, _ := s.store.ListTargets(sk.ID)
 		result = append(result, skillWithTargets{Skill: sk, Targets: targets})

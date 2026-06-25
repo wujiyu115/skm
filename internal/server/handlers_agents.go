@@ -24,8 +24,9 @@ func (s *Server) listAgents(c *fiber.Ctx) error {
 		Detected bool `json:"detected"`
 	}
 
-	var result []agentInfo
-	for _, a := range agent.Builtin() {
+	builtins := agent.Builtin()
+	result := make([]agentInfo, 0, len(builtins))
+	for _, a := range builtins {
 		result = append(result, agentInfo{Adapter: a, Detected: detectedMap[a.Name]})
 	}
 	return c.JSON(result)

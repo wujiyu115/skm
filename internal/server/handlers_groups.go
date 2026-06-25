@@ -33,7 +33,7 @@ func (s *Server) listGroups(c *fiber.Ctx) error {
 		store.Group
 		SkillCount int `json:"skill_count"`
 	}
-	var result []groupWithCount
+	result := make([]groupWithCount, 0, len(groups))
 	for _, g := range groups {
 		skills, _ := s.store.ListGroupSkills(g.ID)
 		result = append(result, groupWithCount{Group: g, SkillCount: len(skills)})
