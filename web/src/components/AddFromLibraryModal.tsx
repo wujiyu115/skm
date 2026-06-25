@@ -266,9 +266,9 @@ export default function AddFromLibraryModal({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">{sk.Name}</span>
-                          {sk.Source && (
+                          {sk.SourceType && (
                             <span className="text-xs px-1.5 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded">
-                              {sk.Source}
+                              {sk.SourceType}
                             </span>
                           )}
                         </div>

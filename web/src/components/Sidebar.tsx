@@ -5,7 +5,7 @@ import {
   ChevronDown, ChevronRight, FolderOpen, Globe, Terminal, Code, MousePointer, Sparkles,
   Briefcase,
 } from 'lucide-react'
-import { api, type Group, type Agent, type Skill, type Project } from '../lib/api'
+import { api, type Group, type Agent, type Project } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 
 const agentIcons: Record<string, typeof Terminal> = {
@@ -19,7 +19,6 @@ export default function Sidebar() {
   const { t, locale } = useI18n()
   const [groups, setGroups] = useState<Group[]>([])
   const [agents, setAgents] = useState<Agent[]>([])
-  const [skills, setSkills] = useState<Skill[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [agentSkillCounts, setAgentSkillCounts] = useState<Record<string, number>>({})
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({})
@@ -30,10 +29,9 @@ export default function Sidebar() {
       api.agents.list(),
       api.skills.list(),
       api.projects.list(),
-    ]).then(([g, a, s, p]) => {
+    ]).then(([g, a, _s, p]) => {
       setGroups(g ?? [])
       setAgents(a ?? [])
-      setSkills(s ?? [])
       setProjects(p ?? [])
       const detected = (a ?? []).filter((ag: Agent) => ag.detected)
       Promise.all(
