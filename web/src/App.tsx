@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
+import CommandPalette from './components/CommandPalette'
 import Dashboard from './pages/Dashboard'
 import SkillsLibrary from './pages/SkillsLibrary'
 import Install from './pages/Install'
@@ -11,6 +12,7 @@ import AuditLog from './pages/AuditLog'
 export default function App() {
   return (
     <div className="flex h-screen">
+      <CommandPalette />
       <Sidebar />
       <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-900 p-8">
         <Routes>
