@@ -2,7 +2,7 @@ package store
 
 import "fmt"
 
-const currentVersion = 2
+const currentVersion = 3
 
 func (s *Store) migrate() error {
 	var version int
@@ -18,6 +18,12 @@ func (s *Store) migrate() error {
 
 	if version < 2 {
 		if err := s.migrateV2(); err != nil {
+			return err
+		}
+	}
+
+	if version < 3 {
+		if err := s.migrateV3(); err != nil {
 			return err
 		}
 	}
@@ -144,6 +150,34 @@ func (s *Store) migrateV2() error {
 	}
 
 	if _, err := s.db.Exec("PRAGMA user_version = 2"); err != nil {
+		return fmt.Errorf("set user_version: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Store) migrateV3() error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmts := []string{
+		`ALTER TABLE agents ADD COLUMN category TEXT DEFAULT ''`,
+	}
+
+	for _, stmt := range stmts {
+		if _, err := tx.Exec(stmt); err != nil {
+			return fmt.Errorf("migration v3: %w", err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("migration v3 commit: %w", err)
+	}
+
+	if _, err := s.db.Exec("PRAGMA user_version = 3"); err != nil {
 		return fmt.Errorf("set user_version: %w", err)
 	}
 

@@ -11,9 +11,9 @@ func (s *Store) SeedBuiltinAgents(agents []agent.Adapter) error {
 	for _, a := range agents {
 		detectJSON, _ := json.Marshal(a.DetectPaths)
 		_, err := s.db.Exec(
-			`INSERT OR IGNORE INTO agents (name, display_name, project_dir, global_dir, detect_paths, is_builtin, enabled)
-			 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-			a.Name, a.DisplayName, a.ProjectDir, a.GlobalDir, string(detectJSON), 1, 1,
+			`INSERT OR IGNORE INTO agents (name, display_name, project_dir, global_dir, detect_paths, is_builtin, enabled, category)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+			a.Name, a.DisplayName, a.ProjectDir, a.GlobalDir, string(detectJSON), 1, 1, a.Category,
 		)
 		if err != nil {
 			return err
@@ -25,7 +25,7 @@ func (s *Store) SeedBuiltinAgents(agents []agent.Adapter) error {
 // ListAgents returns all enabled agents ordered by name.
 func (s *Store) ListAgents() ([]agent.Adapter, error) {
 	rows, err := s.db.Query(
-		"SELECT name, display_name, project_dir, global_dir, detect_paths, is_builtin FROM agents WHERE enabled = 1 ORDER BY name",
+		"SELECT name, display_name, project_dir, global_dir, detect_paths, is_builtin, COALESCE(category,'') FROM agents WHERE enabled = 1 ORDER BY name",
 	)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (s *Store) ListAgents() ([]agent.Adapter, error) {
 	for rows.Next() {
 		var a agent.Adapter
 		var detectJSON string
-		if err := rows.Scan(&a.Name, &a.DisplayName, &a.ProjectDir, &a.GlobalDir, &detectJSON, &a.IsBuiltin); err != nil {
+		if err := rows.Scan(&a.Name, &a.DisplayName, &a.ProjectDir, &a.GlobalDir, &detectJSON, &a.IsBuiltin, &a.Category); err != nil {
 			return nil, err
 		}
 		json.Unmarshal([]byte(detectJSON), &a.DetectPaths)
@@ -49,9 +49,9 @@ func (s *Store) ListAgents() ([]agent.Adapter, error) {
 func (s *Store) InsertAgent(a agent.Adapter) error {
 	detectJSON, _ := json.Marshal(a.DetectPaths)
 	_, err := s.db.Exec(
-		`INSERT INTO agents (name, display_name, project_dir, global_dir, detect_paths, is_builtin, enabled)
-		 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		a.Name, a.DisplayName, a.ProjectDir, a.GlobalDir, string(detectJSON), 0, 1,
+		`INSERT INTO agents (name, display_name, project_dir, global_dir, detect_paths, is_builtin, enabled, category)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		a.Name, a.DisplayName, a.ProjectDir, a.GlobalDir, string(detectJSON), 0, 1, a.Category,
 	)
 	return err
 }

@@ -6,20 +6,113 @@ import (
 	"testing"
 )
 
-func TestBuiltin_ReturnsThreeAgents(t *testing.T) {
+func TestBuiltin_Returns52Agents(t *testing.T) {
 	agents := Builtin()
-	if len(agents) != 3 {
-		t.Fatalf("expected 3 built-in agents, got %d", len(agents))
+	if len(agents) < 50 {
+		t.Fatalf("expected 50+ built-in agents, got %d", len(agents))
 	}
+	if len(agents) != 52 {
+		t.Fatalf("expected exactly 52 built-in agents, got %d", len(agents))
+	}
+}
 
-	names := map[string]bool{}
+func TestBuiltin_NoDuplicateNames(t *testing.T) {
+	agents := Builtin()
+	seen := map[string]bool{}
 	for _, a := range agents {
-		names[a.Name] = true
-	}
-	for _, want := range []string{"claude", "cursor", "codex"} {
-		if !names[want] {
-			t.Errorf("missing built-in agent: %s", want)
+		if seen[a.Name] {
+			t.Errorf("duplicate agent name: %s", a.Name)
 		}
+		seen[a.Name] = true
+	}
+}
+
+func TestBuiltin_AllFieldsNonEmpty(t *testing.T) {
+	for _, a := range Builtin() {
+		if a.Name == "" {
+			t.Error("agent has empty Name")
+		}
+		if a.DisplayName == "" {
+			t.Errorf("agent %s has empty DisplayName", a.Name)
+		}
+		if a.ProjectDir == "" {
+			t.Errorf("agent %s has empty ProjectDir", a.Name)
+		}
+		if a.GlobalDir == "" {
+			t.Errorf("agent %s has empty GlobalDir", a.Name)
+		}
+		if len(a.DetectPaths) == 0 {
+			t.Errorf("agent %s has empty DetectPaths", a.Name)
+		}
+		if !a.IsBuiltin {
+			t.Errorf("agent %s has IsBuiltin=false", a.Name)
+		}
+	}
+}
+
+func TestBuiltin_CategoryIsValid(t *testing.T) {
+	for _, a := range Builtin() {
+		if a.Category != "coding" && a.Category != "lobster" {
+			t.Errorf("agent %s has invalid Category=%q (want coding or lobster)", a.Name, a.Category)
+		}
+	}
+}
+
+func TestBuiltin_CategoryCounts(t *testing.T) {
+	coding, lobster := 0, 0
+	for _, a := range Builtin() {
+		switch a.Category {
+		case "coding":
+			coding++
+		case "lobster":
+			lobster++
+		}
+	}
+	if coding != 46 {
+		t.Errorf("expected 46 coding agents, got %d", coding)
+	}
+	if lobster != 6 {
+		t.Errorf("expected 6 lobster agents, got %d", lobster)
+	}
+}
+
+func TestFind_KeyAgents(t *testing.T) {
+	tests := []struct {
+		name        string
+		displayName string
+		category    string
+	}{
+		{"claude", "Claude Code", "coding"},
+		{"cursor", "Cursor", "coding"},
+		{"codex", "Codex", "coding"},
+		{"windsurf", "Windsurf", "coding"},
+		{"gemini_cli", "Gemini CLI", "coding"},
+		{"github_copilot", "GitHub Copilot", "coding"},
+		{"amp", "Amp", "coding"},
+		{"roo_code", "Roo Code", "coding"},
+		{"kilo_code", "Kilo Code", "coding"},
+		{"cline", "Cline", "coding"},
+		{"trae", "Trae", "coding"},
+		{"continue_dev", "Continue", "coding"},
+		{"aider", "Aider", "coding"},
+		{"kiro", "Kiro", "coding"},
+		{"openclaw", "OpenClaw", "lobster"},
+		{"hermes", "Hermes", "lobster"},
+		{"workbuddy", "WorkBuddy", "lobster"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a, ok := Find(tt.name)
+			if !ok {
+				t.Fatalf("Find(%s) returned false", tt.name)
+			}
+			if a.DisplayName != tt.displayName {
+				t.Errorf("DisplayName = %q, want %q", a.DisplayName, tt.displayName)
+			}
+			if a.Category != tt.category {
+				t.Errorf("Category = %q, want %q", a.Category, tt.category)
+			}
+		})
 	}
 }
 
