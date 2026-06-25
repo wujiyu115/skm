@@ -53,6 +53,10 @@ const translations = {
     'groups.back': 'Back to Groups',
     'groups.noSkillsInGroup': 'No skills in this group',
     'groups.addHint': 'Add skills using the CLI: skm group add',
+    'groups.addSkills': 'Add Skills',
+    'groups.searchSkills': 'Search skills...',
+    'groups.noAvailable': 'No available skills to add',
+    'groups.add': 'Add',
 
     'agents.title': 'Agent Workspaces',
     'agents.active': 'Active',
@@ -142,6 +146,10 @@ const translations = {
     'groups.back': '返回技能组',
     'groups.noSkillsInGroup': '该组暂无技能',
     'groups.addHint': '使用 CLI 添加技能: skm group add',
+    'groups.addSkills': '添加技能',
+    'groups.searchSkills': '搜索技能...',
+    'groups.noAvailable': '没有可添加的技能',
+    'groups.add': '添加',
 
     'agents.title': '智能体工作区',
     'agents.active': '已检测',

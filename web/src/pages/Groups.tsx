@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { FolderOpen, Plus, ArrowLeft, Trash2, X } from 'lucide-react'
+import { FolderOpen, Plus, ArrowLeft, Trash2, X, Search } from 'lucide-react'
 import { api, type Group, type Skill } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 
@@ -126,22 +126,39 @@ function GroupDetail({ id }: { id: string }) {
   const { t } = useI18n()
   const [group, setGroup] = useState<Group | null>(null)
   const [skills, setSkills] = useState<Skill[]>([])
+  const [allSkills, setAllSkills] = useState<Skill[]>([])
+  const [showAdd, setShowAdd] = useState(false)
+  const [addSearch, setAddSearch] = useState('')
   const navigate = useNavigate()
 
-  useEffect(() => {
-    api.groups.get(id).then(data => {
-      setGroup(data.group)
-      setSkills(data.skills ?? [])
-    }).catch(() => navigate('/groups'))
-  }, [id, navigate])
+  const load = () => {
+    Promise.all([api.groups.get(id), api.skills.list()])
+      .then(([data, all]) => {
+        setGroup(data.group)
+        setSkills(data.skills ?? [])
+        setAllSkills(all ?? [])
+      })
+      .catch(() => navigate('/groups'))
+  }
+
+  useEffect(() => { load() }, [id, navigate])
 
   const removeSkill = async (skillId: string) => {
     await api.groups.removeSkill(id, skillId)
-    const data = await api.groups.get(id)
-    setSkills(data.skills ?? [])
+    load()
+  }
+
+  const addSkill = async (skillId: string) => {
+    await api.groups.addSkills(id, [skillId])
+    load()
   }
 
   if (!group) return null
+
+  const groupSkillIds = new Set(skills.map(s => s.ID))
+  const available = allSkills
+    .filter(s => !groupSkillIds.has(s.ID))
+    .filter(s => !addSearch || s.Name.toLowerCase().includes(addSearch.toLowerCase()) || s.Description.toLowerCase().includes(addSearch.toLowerCase()))
 
   return (
     <div>
@@ -152,22 +169,71 @@ function GroupDetail({ id }: { id: string }) {
         <ArrowLeft className="w-4 h-4" /> {t('groups.back')}
       </button>
 
-      <div className="flex items-center gap-3 mb-6">
-        <FolderOpen className="w-6 h-6 text-purple-500" />
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{group.name}</h2>
-        <span className="px-2.5 py-0.5 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-          {skills.length} {t('groups.skills')}
-        </span>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <FolderOpen className="w-6 h-6 text-purple-500" />
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{group.name}</h2>
+          <span className="px-2.5 py-0.5 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+            {skills.length} {t('groups.skills')}
+          </span>
+        </div>
+        <button
+          onClick={() => setShowAdd(!showAdd)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" /> {t('groups.addSkills')}
+        </button>
       </div>
 
       {group.description && (
         <p className="text-slate-500 dark:text-slate-400 mb-6">{group.description}</p>
       )}
 
-      {skills.length === 0 ? (
+      {showAdd && (
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 mb-6">
+          <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3">{t('groups.addSkills')}</h3>
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              value={addSearch}
+              onChange={e => setAddSearch(e.target.value)}
+              placeholder={t('groups.searchSkills')}
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+          {available.length === 0 ? (
+            <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">{t('groups.noAvailable')}</p>
+          ) : (
+            <div className="space-y-1 max-h-64 overflow-y-auto">
+              {available.map(sk => (
+                <div key={sk.ID} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                  <div>
+                    <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">{sk.Name}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">{sk.Description}</span>
+                  </div>
+                  <button
+                    onClick={() => addSkill(sk.ID)}
+                    className="px-3 py-1 bg-primary-600 text-white rounded text-xs font-medium hover:bg-primary-700 transition-colors"
+                  >
+                    {t('groups.add')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {skills.length === 0 && !showAdd ? (
         <div className="text-center py-12 text-slate-500 dark:text-slate-400">
+          <FolderOpen className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-slate-600" />
           <p>{t('groups.noSkillsInGroup')}</p>
-          <p className="text-sm mt-1">{t('groups.addHint')} {group.name} &lt;skill&gt;</p>
+          <button
+            onClick={() => setShowAdd(true)}
+            className="mt-3 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+          >
+            <Plus className="w-4 h-4 inline mr-1" />{t('groups.addSkills')}
+          </button>
         </div>
       ) : (
         <div className="space-y-2">
