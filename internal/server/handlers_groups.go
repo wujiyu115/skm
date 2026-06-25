@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/ejoy/skm/internal/agent"
+	"github.com/ejoy/skm/internal/logger"
 	"github.com/ejoy/skm/internal/store"
 	skmsync "github.com/ejoy/skm/internal/sync"
 )
@@ -53,6 +54,11 @@ func (s *Server) createGroup(c *fiber.Ctx) error {
 	if err := s.store.InsertGroup(id, req.Name, req.Description); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
+
+	if err := s.store.InsertAuditLog("group_create", req.Name, ""); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
+
 	s.writeMetadata()
 	return c.Status(201).JSON(fiber.Map{"id": id, "name": req.Name})
 }
@@ -82,9 +88,21 @@ func (s *Server) updateGroup(c *fiber.Ctx) error {
 }
 
 func (s *Server) deleteGroup(c *fiber.Ctx) error {
-	if err := s.store.DeleteGroup(c.Params("id")); err != nil {
+	id := c.Params("id")
+	g, _ := s.store.GetGroupByID(id)
+
+	if err := s.store.DeleteGroup(id); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
+
+	target := id
+	if g != nil {
+		target = g.Name
+	}
+	if err := s.store.InsertAuditLog("group_delete", target, ""); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
+
 	s.writeMetadata()
 	return c.JSON(fiber.Map{"ok": true})
 }

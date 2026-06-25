@@ -233,6 +233,10 @@ func (s *Server) syncSkill(c *fiber.Ctx) error {
 		}
 	}
 
+	if err := s.store.InsertAuditLog("sync", sk.Name, ""); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
+
 	return c.JSON(fiber.Map{"ok": true})
 }
 

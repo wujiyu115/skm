@@ -1,7 +1,12 @@
 package server
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/ejoy/skm/internal/logger"
 )
 
 func (s *Server) registerTagRoutes(api fiber.Router) {
@@ -61,6 +66,10 @@ func (s *Server) setSkillTags(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	if err := s.store.InsertAuditLog("tags_set", id, strings.Join(req.Tags, ",")); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
+
 	return c.JSON(fiber.Map{"ok": true})
 }
 
@@ -80,6 +89,10 @@ func (s *Server) renameTag(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	if err := s.store.InsertAuditLog("tag_rename", req.Old, fmt.Sprintf("renamed to %s", req.New)); err != nil {
+		logger.Warn("audit log failed", "err", err)
+	}
+
 	return c.JSON(fiber.Map{"ok": true})
 }
 
@@ -88,6 +101,10 @@ func (s *Server) deleteTag(c *fiber.Ctx) error {
 
 	if err := s.store.DeleteTag(tag); err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	if err := s.store.InsertAuditLog("tag_delete", tag, ""); err != nil {
+		logger.Warn("audit log failed", "err", err)
 	}
 
 	return c.JSON(fiber.Map{"ok": true})
