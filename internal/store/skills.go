@@ -109,6 +109,26 @@ func (s *Store) DeleteSkillByName(name string) error {
 	return nil
 }
 
+// SetSkillEnabled sets the enabled flag for a skill by ID.
+func (s *Store) SetSkillEnabled(id string, enabled bool) error {
+	val := 0
+	if enabled {
+		val = 1
+	}
+	res, err := s.db.Exec(
+		"UPDATE skills SET enabled = ?, updated_at = datetime('now') WHERE id = ?",
+		val, id,
+	)
+	if err != nil {
+		return fmt.Errorf("set skill enabled: %w", err)
+	}
+	n, _ := res.RowsAffected()
+	if n == 0 {
+		return fmt.Errorf("skill with id %q not found", id)
+	}
+	return nil
+}
+
 // UpdateSkillHash updates the content hash and updated_at timestamp for a skill.
 func (s *Store) UpdateSkillHash(id, hash string) error {
 	_, err := s.db.Exec(

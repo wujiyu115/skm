@@ -34,8 +34,8 @@ func TestNew_RunsMigrations(t *testing.T) {
 	if err != nil {
 		t.Fatalf("PRAGMA user_version error: %v", err)
 	}
-	if version != 1 {
-		t.Fatalf("expected user_version=1, got %d", version)
+	if version != 2 {
+		t.Fatalf("expected user_version=2, got %d", version)
 	}
 }
 
@@ -50,6 +50,49 @@ func TestNew_CreatesSkillsTable(t *testing.T) {
 	_, err = s.db.Exec("SELECT id, name, description, source_type, source_ref, central_path, content_hash, enabled, installed_at, updated_at FROM skills LIMIT 0")
 	if err != nil {
 		t.Fatalf("skills table missing or wrong schema: %v", err)
+	}
+}
+
+func TestNew_MigrationV2_SkillColumns(t *testing.T) {
+	dir := t.TempDir()
+	s, err := New(filepath.Join(dir, "test.db"))
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+	defer s.Close()
+
+	// Verify the new columns exist on the skills table
+	_, err = s.db.Exec("SELECT source_branch, source_subpath, remote_revision, update_status, last_checked_at FROM skills LIMIT 0")
+	if err != nil {
+		t.Fatalf("v2 skill columns missing: %v", err)
+	}
+}
+
+func TestNew_MigrationV2_SkillTagsTable(t *testing.T) {
+	dir := t.TempDir()
+	s, err := New(filepath.Join(dir, "test.db"))
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+	defer s.Close()
+
+	_, err = s.db.Exec("SELECT skill_id, tag FROM skill_tags LIMIT 0")
+	if err != nil {
+		t.Fatalf("skill_tags table missing or wrong schema: %v", err)
+	}
+}
+
+func TestNew_MigrationV2_AuditLogTable(t *testing.T) {
+	dir := t.TempDir()
+	s, err := New(filepath.Join(dir, "test.db"))
+	if err != nil {
+		t.Fatalf("New() error: %v", err)
+	}
+	defer s.Close()
+
+	_, err = s.db.Exec("SELECT id, action, target, detail, created_at FROM audit_log LIMIT 0")
+	if err != nil {
+		t.Fatalf("audit_log table missing or wrong schema: %v", err)
 	}
 }
 

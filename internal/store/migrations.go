@@ -2,7 +2,7 @@ package store
 
 import "fmt"
 
-const currentVersion = 1
+const currentVersion = 2
 
 func (s *Store) migrate() error {
 	var version int
@@ -12,6 +12,12 @@ func (s *Store) migrate() error {
 
 	if version < 1 {
 		if err := s.migrateV1(); err != nil {
+			return err
+		}
+	}
+
+	if version < 2 {
+		if err := s.migrateV2(); err != nil {
 			return err
 		}
 	}
@@ -87,6 +93,57 @@ func (s *Store) migrateV1() error {
 
 	// PRAGMA is not transactional in SQLite; execute after commit.
 	if _, err := s.db.Exec("PRAGMA user_version = 1"); err != nil {
+		return fmt.Errorf("set user_version: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Store) migrateV2() error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	stmts := []string{
+		// Add columns to skills
+		`ALTER TABLE skills ADD COLUMN source_branch TEXT DEFAULT ''`,
+		`ALTER TABLE skills ADD COLUMN source_subpath TEXT DEFAULT ''`,
+		`ALTER TABLE skills ADD COLUMN remote_revision TEXT DEFAULT ''`,
+		`ALTER TABLE skills ADD COLUMN update_status TEXT DEFAULT 'unknown'`,
+		`ALTER TABLE skills ADD COLUMN last_checked_at TEXT`,
+
+		// Skill tags
+		`CREATE TABLE IF NOT EXISTS skill_tags (
+			skill_id TEXT NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
+			tag      TEXT NOT NULL,
+			PRIMARY KEY (skill_id, tag)
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_skill_tags_tag ON skill_tags(tag)`,
+
+		// Audit log
+		`CREATE TABLE IF NOT EXISTS audit_log (
+			id         INTEGER PRIMARY KEY AUTOINCREMENT,
+			action     TEXT NOT NULL,
+			target     TEXT,
+			detail     TEXT,
+			created_at TEXT DEFAULT (datetime('now'))
+		)`,
+		`CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log(created_at)`,
+	}
+
+	for _, stmt := range stmts {
+		if _, err := tx.Exec(stmt); err != nil {
+			return fmt.Errorf("migration v2: %w", err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("migration v2 commit: %w", err)
+	}
+
+	if _, err := s.db.Exec("PRAGMA user_version = 2"); err != nil {
 		return fmt.Errorf("set user_version: %w", err)
 	}
 
