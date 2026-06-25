@@ -18,7 +18,7 @@ export default function TagFilter({ tags, activeTags, onToggle }: TagFilterProps
             className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
               active
                 ? 'bg-primary-500 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
             }`}
           >
             {tag}

@@ -116,7 +116,7 @@ export default function Install() {
     <div>
       <div className="flex items-center gap-3 mb-6">
         <Download className="w-6 h-6 text-primary-600" />
-        <h2 className="text-2xl font-bold text-slate-900">{t('install.title')}</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('install.title')}</h2>
       </div>
 
       {message && (
@@ -127,7 +127,7 @@ export default function Install() {
         </div>
       )}
 
-      <div className="flex items-center gap-1 mb-6 border-b border-slate-200">
+      <div className="flex items-center gap-1 mb-6 border-b border-slate-200 dark:border-slate-700">
         {tabs.map(t => {
           const Icon = t.icon
           return (
@@ -137,7 +137,7 @@ export default function Install() {
               className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                 tab === t.key
                   ? 'border-primary-600 text-primary-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
               }`}
             >
               <Icon className="w-4 h-4" /> {t.label}
@@ -155,7 +155,7 @@ export default function Install() {
                   key={f.key}
                   onClick={() => setFilter(f.key)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    filter === f.key ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-100'
+                    filter === f.key ? 'bg-primary-600 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
                   {f.label}
@@ -165,7 +165,7 @@ export default function Install() {
             <select
               value={sourceFilter}
               onChange={e => setSourceFilter(e.target.value)}
-              className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-600 dark:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">{t('install.filterSource')}</option>
               {sources.map(s => <option key={s} value={s}>{s}</option>)}
@@ -176,7 +176,7 @@ export default function Install() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder={t('install.search')}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -186,14 +186,14 @@ export default function Install() {
               const isInstalled = installed.has(sk.name)
               const isInstalling = installing === sk.name
               return (
-                <div key={sk.name} className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md transition-shadow">
+                <div key={sk.name} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 hover:shadow-md transition-shadow">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center text-lg">
                         {sk.icon}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-900 text-sm">{sk.name}</h3>
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">{sk.name}</h3>
                         <span className="text-xs text-slate-400">{sk.source}</span>
                       </div>
                     </div>
@@ -215,7 +215,7 @@ export default function Install() {
                       )}
                     </button>
                   </div>
-                  <p className="text-xs text-slate-500 mt-2 line-clamp-2">{sk.description}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">{sk.description}</p>
                 </div>
               )
             })}
@@ -225,12 +225,12 @@ export default function Install() {
 
       {tab === 'local' && (
         <div className="max-w-xl">
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-4">
               <FolderOpen className="w-8 h-8 text-slate-400" />
               <div>
-                <h3 className="font-semibold text-slate-900">{t('install.localTitle')}</h3>
-                <p className="text-sm text-slate-500">{t('install.localDesc')}</p>
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t('install.localTitle')}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('install.localDesc')}</p>
               </div>
             </div>
             <div className="space-y-4">
@@ -238,7 +238,7 @@ export default function Install() {
                 value={localPath}
                 onChange={e => setLocalPath(e.target.value)}
                 placeholder={t('install.localPlaceholder')}
-                className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500"
                 onKeyDown={e => e.key === 'Enter' && localPath.trim() && doInstall(localPath)}
               />
               <AdvancedOptions
@@ -262,12 +262,12 @@ export default function Install() {
 
       {tab === 'git' && (
         <div className="max-w-xl">
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-4">
               <GitBranch className="w-8 h-8 text-slate-400" />
               <div>
-                <h3 className="font-semibold text-slate-900">{t('install.gitTitle')}</h3>
-                <p className="text-sm text-slate-500">{t('install.gitDesc')}</p>
+                <h3 className="font-semibold text-slate-900 dark:text-slate-100">{t('install.gitTitle')}</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('install.gitDesc')}</p>
               </div>
             </div>
             <div className="space-y-4">
@@ -276,7 +276,7 @@ export default function Install() {
                   value={gitUrl}
                   onChange={e => setGitUrl(e.target.value)}
                   placeholder={t('install.gitPlaceholder')}
-                  className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary-500"
                   onKeyDown={e => e.key === 'Enter' && gitUrl.trim() && doInstall(gitUrl)}
                 />
                 <p className="text-xs text-slate-400 mt-1.5">
@@ -316,14 +316,14 @@ function AdvancedOptions({ show, onToggle, globalInstall, setGlobalInstall }: {
     <div>
       <button
         onClick={onToggle}
-        className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700"
+        className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
       >
         {show ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         {t('install.advancedOptions')}
       </button>
       {show && (
-        <div className="mt-3 p-4 bg-slate-50 rounded-lg space-y-3">
-          <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+        <div className="mt-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg space-y-3">
+          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
             <input
               type="checkbox"
               checked={globalInstall}

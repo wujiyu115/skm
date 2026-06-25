@@ -42,22 +42,22 @@ export default function Dashboard() {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-slate-900">{t('dashboard.title')}</h2>
-        <p className="text-slate-500 mt-1">{t('dashboard.subtitle')}</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('dashboard.title')}</h2>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">{t('dashboard.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
         {cards.map(c => {
           const Icon = c.icon
           return (
-            <div key={c.key} className={`bg-white rounded-xl border-b-2 ${c.accent} border border-slate-200 p-5 shadow-sm`}>
+            <div key={c.key} className={`bg-white dark:bg-slate-800 rounded-xl border-b-2 ${c.accent} border border-slate-200 dark:border-slate-700 p-5 shadow-sm`}>
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-lg ${c.color} flex items-center justify-center`}>
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-xs font-medium text-slate-500 uppercase">{c.label}</div>
-                  <div className="text-2xl font-bold text-slate-900">{stats[c.key]}</div>
+                  <div className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">{c.label}</div>
+                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats[c.key]}</div>
                 </div>
               </div>
             </div>
@@ -66,7 +66,7 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-8">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">{t('dashboard.quickActions')}</h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">{t('dashboard.quickActions')}</h3>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => navigate('/skills')}
@@ -76,13 +76,13 @@ export default function Dashboard() {
           </button>
           <button
             onClick={() => navigate('/install')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 dark:border-slate-700 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
           >
             <ArrowRight className="w-4 h-4" /> {t('dashboard.installSkill')}
           </button>
           <button
             onClick={() => navigate('/groups')}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 dark:border-slate-700 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
           >
             <FolderOpen className="w-4 h-4" /> {t('dashboard.createGroup')}
           </button>

@@ -11,7 +11,7 @@ export default function App() {
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <main className="flex-1 overflow-auto bg-slate-50 p-8">
+      <main className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-900 p-8">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/skills" element={<SkillsLibrary />} />
