@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Search, LayoutGrid, List, RefreshCw, CheckSquare, Download } from 'lucide-react'
 import { api, type Skill } from '../lib/api'
 import { useI18n } from '../lib/i18n'
+import { toast } from '../lib/toast'
 import SkillCard from '../components/SkillCard'
 import TagFilter from '../components/TagFilter'
 
@@ -81,6 +82,16 @@ export default function SkillsLibrary() {
       await api.skills.remove(id)
       load()
     } catch { /* ignore */ }
+  }
+
+  const handleToggleEnabled = async (id: string, enabled: boolean) => {
+    try {
+      await api.skills.setEnabled(id, enabled)
+      toast.success(t(enabled ? 'toast.skillEnabled' : 'toast.skillDisabled'))
+      load()
+    } catch {
+      toast.error(t('toast.error'))
+    }
   }
 
   const tabs: { key: Tab; label: string }[] = [
@@ -197,6 +208,7 @@ export default function SkillsLibrary() {
               onSelect={toggleSelect}
               onRemove={removeSkill}
               onSync={id => api.skills.sync(id, []).then(load)}
+              onToggleEnabled={handleToggleEnabled}
             />
           ))}
         </div>

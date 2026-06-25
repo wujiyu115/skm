@@ -6,6 +6,7 @@ interface SkillCardProps {
   skill: Skill
   onRemove?: (id: string) => void
   onSync?: (id: string) => void
+  onToggleEnabled?: (id: string, enabled: boolean) => void
   selected?: boolean
   onSelect?: (id: string) => void
 }
@@ -16,7 +17,7 @@ const agentColors: Record<string, string> = {
   codex: 'bg-purple-100 text-purple-700',
 }
 
-export default function SkillCard({ skill, onRemove, onSync, selected, onSelect }: SkillCardProps) {
+export default function SkillCard({ skill, onRemove, onSync, onToggleEnabled, selected, onSelect }: SkillCardProps) {
   const { t } = useI18n()
   const sourceIcon = skill.SourceType === 'git'
     ? <GitBranch className="w-3 h-3" />
@@ -36,13 +37,17 @@ export default function SkillCard({ skill, onRemove, onSync, selected, onSelect 
           )}
           <h3 className="font-semibold text-slate-900 dark:text-slate-100">{skill.Name}</h3>
         </div>
-        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-          skill.Enabled
-            ? 'bg-primary-100 text-primary-700'
-            : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
-        }`}>
-          {skill.Enabled ? t('skills.enabled') : t('skills.disabled')}
-        </span>
+        <button
+          type="button"
+          onClick={() => onToggleEnabled?.(skill.ID, !skill.Enabled)}
+          className={`px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer transition-colors ${
+            skill.Enabled
+              ? 'bg-green-100 text-green-700 hover:bg-green-200'
+              : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+          }`}
+        >
+          {skill.Enabled ? t('detail.enabled') : t('detail.disabled')}
+        </button>
       </div>
 
       <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">{skill.Description}</p>

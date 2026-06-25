@@ -56,6 +56,11 @@ export const api = {
         body: JSON.stringify({ source, agents, global }),
       }),
     remove: (id: string) => request(`/skills/${id}`, { method: 'DELETE' }),
+    setEnabled: (id: string, enabled: boolean) =>
+      request<{ ok: boolean }>(`/skills/${id}/enable`, {
+        method: 'PUT',
+        body: JSON.stringify({ enabled }),
+      }),
     content: (id: string) => request<{ content: string }>(`/skills/${id}/content`),
     sync: (id: string, agents: string[]) =>
       request(`/skills/${id}/sync`, {

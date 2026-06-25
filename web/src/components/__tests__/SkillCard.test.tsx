@@ -50,6 +50,20 @@ describe('SkillCard', () => {
     expect(onSync).toHaveBeenCalledWith('skill-1')
   })
 
+  it('calls onToggleEnabled with toggled value when badge is clicked', async () => {
+    const onToggleEnabled = vi.fn()
+    renderWithRouter(<SkillCard skill={mockSkill({ Enabled: true })} onToggleEnabled={onToggleEnabled} />)
+    await userEvent.click(screen.getByText('Enabled'))
+    expect(onToggleEnabled).toHaveBeenCalledWith('skill-1', false)
+  })
+
+  it('calls onToggleEnabled to enable when disabled badge is clicked', async () => {
+    const onToggleEnabled = vi.fn()
+    renderWithRouter(<SkillCard skill={mockSkill({ Enabled: false })} onToggleEnabled={onToggleEnabled} />)
+    await userEvent.click(screen.getByText('Disabled'))
+    expect(onToggleEnabled).toHaveBeenCalledWith('skill-1', true)
+  })
+
   it('shows checkbox when onSelect provided', () => {
     renderWithRouter(<SkillCard skill={mockSkill()} onSelect={() => {}} selected={false} />)
     expect(screen.getByRole('checkbox')).toBeInTheDocument()

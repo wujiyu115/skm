@@ -46,7 +46,9 @@ describe('SkillsLibrary', () => {
   it('filters by Enabled tab', async () => {
     renderWithRouter(<SkillsLibrary />)
     await screen.findByText('react-helper')
-    await userEvent.click(screen.getByRole('button', { name: 'Enabled' }))
+    // The tab button is the first "Enabled" button (before the card badges)
+    const enabledButtons = screen.getAllByRole('button', { name: 'Enabled' })
+    await userEvent.click(enabledButtons[0])
     expect(screen.getByText('react-helper')).toBeInTheDocument()
     expect(screen.queryByText('go-patterns')).not.toBeInTheDocument()
   })
