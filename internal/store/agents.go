@@ -19,6 +19,10 @@ func (s *Store) SeedBuiltinAgents(agents []agent.Adapter) error {
 			return err
 		}
 	}
+	// Update category for existing agents that predate v3
+	for _, a := range agents {
+		s.db.Exec("UPDATE agents SET category = ? WHERE name = ? AND category = ''", a.Category, a.Name)
+	}
 	return nil
 }
 
