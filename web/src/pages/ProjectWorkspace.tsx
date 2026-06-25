@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { FolderOpen, Plus, ArrowLeft, Trash2, Briefcase } from 'lucide-react'
-import { api, type Project, type ProjectSkill, type Skill, type Agent } from '../lib/api'
+import { api, type Project, type ProjectSkill, type Agent } from '../lib/api'
 import { useI18n } from '../lib/i18n'
 import { toast } from '../lib/toast'
+import AddFromLibraryModal from '../components/AddFromLibraryModal'
 
 export default function ProjectWorkspace() {
   const { id } = useParams<{ id: string }>()
@@ -120,10 +121,8 @@ function ProjectDetail({ id }: { id: string }) {
   const { t } = useI18n()
   const [project, setProject] = useState<Project | null>(null)
   const [skills, setSkills] = useState<ProjectSkill[]>([])
-  const [showAdd, setShowAdd] = useState(false)
-  const [librarySkills, setLibrarySkills] = useState<Skill[]>([])
+  const [showAddModal, setShowAddModal] = useState(false)
   const [agents, setAgents] = useState<Agent[]>([])
-  const [selectedAgents, setSelectedAgents] = useState<Record<string, string[]>>({})
   const navigate = useNavigate()
 
   const load = () => {
@@ -139,38 +138,9 @@ function ProjectDetail({ id }: { id: string }) {
 
   useEffect(() => { load() }, [id])
 
-  const openAddForm = () => {
-    setShowAdd(true)
-    Promise.all([api.skills.list(), api.agents.list()])
-      .then(([s, a]) => {
-        setLibrarySkills(s ?? [])
-        setAgents(a ?? [])
-      })
-      .catch(() => {})
-  }
-
-  const toggleAgent = (skillId: string, agentName: string) => {
-    setSelectedAgents(prev => {
-      const current = prev[skillId] ?? []
-      if (current.includes(agentName)) {
-        return { ...prev, [skillId]: current.filter(a => a !== agentName) }
-      }
-      return { ...prev, [skillId]: [...current, agentName] }
-    })
-  }
-
-  const addSkillToProject = async (skillId: string) => {
-    const agentList = selectedAgents[skillId] ?? []
-    if (agentList.length === 0) return
-    try {
-      await api.projects.addSkill(id, skillId, agentList)
-      toast.success(t('toast.skillAddedToProject'))
-      setSelectedAgents(prev => ({ ...prev, [skillId]: [] }))
-      load()
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : t('toast.error'))
-    }
-  }
+  useEffect(() => {
+    api.agents.list().then(a => setAgents(a ?? [])).catch(() => {})
+  }, [])
 
   const toggleSkill = async (agent: string, skillName: string, enabled: boolean) => {
     try {
@@ -222,60 +192,30 @@ function ProjectDetail({ id }: { id: string }) {
           </div>
         </div>
         <button
-          onClick={showAdd ? () => setShowAdd(false) : openAddForm}
+          onClick={() => setShowAddModal(true)}
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
         >
           <Plus className="w-4 h-4" /> {t('projects.addFromLibrary')}
         </button>
       </div>
 
-      {showAdd && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 mb-6">
-          <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3">{t('projects.addFromLibrary')}</h3>
-          {librarySkills.length === 0 ? (
-            <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">{t('skills.noSkills')}</p>
-          ) : (
-            <div className="space-y-2 max-h-80 overflow-y-auto">
-              {librarySkills.map(sk => (
-                <div key={sk.ID} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">{sk.Name}</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">{sk.Description}</span>
-                    <div className="flex gap-2 mt-1">
-                      <span className="text-xs text-slate-400 dark:text-slate-500">{t('projects.selectAgents')}:</span>
-                      {agents.map(a => (
-                        <label key={a.name} className="flex items-center gap-1 text-xs text-slate-600 dark:text-slate-300">
-                          <input
-                            type="checkbox"
-                            checked={(selectedAgents[sk.ID] ?? []).includes(a.name)}
-                            onChange={() => toggleAgent(sk.ID, a.name)}
-                            className="rounded border-slate-300 dark:border-slate-600"
-                          />
-                          {a.display_name}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => addSkillToProject(sk.ID)}
-                    className="px-3 py-1 bg-primary-600 text-white rounded text-xs font-medium hover:bg-primary-700 transition-colors ml-2"
-                  >
-                    {t('groups.add')}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      <AddFromLibraryModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        mode="project"
+        projectId={id}
+        agents={agents}
+        existingSkillNames={skills.map(sk => sk.skill_name)}
+        onSuccess={load}
+      />
 
-      {skills.length === 0 && !showAdd ? (
+      {skills.length === 0 ? (
         <div className="text-center py-12 text-slate-500 dark:text-slate-400">
           <FolderOpen className="w-12 h-12 mx-auto mb-3 text-slate-300 dark:text-slate-600" />
           <p className="text-lg">{t('projects.noSkills')}</p>
           <p className="text-sm mt-2">{t('projects.noSkillsHint')}</p>
           <button
-            onClick={openAddForm}
+            onClick={() => setShowAddModal(true)}
             className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
           >
             <Plus className="w-4 h-4 inline mr-1" />{t('projects.addFromLibrary')}

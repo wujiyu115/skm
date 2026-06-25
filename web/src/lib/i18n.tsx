@@ -203,6 +203,16 @@ const translations = {
     'projects.confirmRemoveProject': 'Unregister this project? (files not deleted)',
     'projects.selectAgents': 'Select Agents',
 
+    // Modal - Add from Library
+    'modal.addFromLibrary': 'Add from Library',
+    'modal.target': 'Target',
+    'modal.tabSkills': 'Skills',
+    'modal.tabGroups': 'Groups',
+    'modal.searchPlaceholder': 'Search skills...',
+    'modal.alreadyAdded': 'Added',
+    'modal.noResults': 'No skills match your search',
+    'modal.adding': 'Adding...',
+
     // Toast - projects
     'toast.projectAdded': 'Project added',
     'toast.projectRemoved': 'Project removed',
@@ -409,6 +419,16 @@ const translations = {
     'projects.confirmRemove': '确定删除此技能？',
     'projects.confirmRemoveProject': '取消注册此项目？（不会删除文件）',
     'projects.selectAgents': '选择智能体',
+
+    // Modal - Add from Library
+    'modal.addFromLibrary': '从技能库添加',
+    'modal.target': '目标',
+    'modal.tabSkills': '技能',
+    'modal.tabGroups': '技能组',
+    'modal.searchPlaceholder': '搜索技能库...',
+    'modal.alreadyAdded': '已添加',
+    'modal.noResults': '没有匹配的技能',
+    'modal.adding': '添加中...',
 
     // Toast - projects
     'toast.projectAdded': '项目已添加',
