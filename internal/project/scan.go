@@ -55,10 +55,11 @@ func ScanSkills(projectPath string, agents []agent.Adapter) ([]ProjectSkill, err
 				continue
 			}
 			for _, e := range entries {
-				if !e.IsDir() {
+				childDir := filepath.Join(dir.path, e.Name())
+				info, err := os.Stat(childDir)
+				if err != nil || !info.IsDir() {
 					continue
 				}
-				childDir := filepath.Join(dir.path, e.Name())
 				if !skill.HasSkillMD(childDir) {
 					continue
 				}

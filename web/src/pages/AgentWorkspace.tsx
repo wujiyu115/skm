@@ -40,7 +40,7 @@ function AgentList() {
     <div>
       <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-6">{t('agents.title')}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {agents.map(a => {
+        {[...agents].sort((a, b) => Number(b.detected) - Number(a.detected)).map(a => {
           const Icon = agentIcons[a.name] ?? Terminal
           const colorClass = agentColors[a.name] ?? 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
           const count = skillCount(a.name)

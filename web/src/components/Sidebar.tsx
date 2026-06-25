@@ -180,7 +180,7 @@ export default function Sidebar() {
               >
                 <span>{t('nav.allAgents')}</span>
               </Link>
-              {agents.map(a => {
+              {agents.filter(a => a.detected).map(a => {
                 const Icon = agentIcons[a.name] ?? Terminal
                 const count = agentSkillCount(a.name)
                 return (
