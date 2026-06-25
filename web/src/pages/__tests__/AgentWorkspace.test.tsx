@@ -10,11 +10,10 @@ vi.mock('../../lib/api', () => ({
         { name: 'claude', display_name: 'Claude Code', project_dir: '.claude/skills', global_dir: '.claude/skills', detected: true },
         { name: 'cursor', display_name: 'Cursor', project_dir: '.cursor/skills', global_dir: '.cursor/skills', detected: false },
       ]),
+      skills: vi.fn().mockResolvedValue([]),
     },
     skills: {
-      list: vi.fn().mockResolvedValue([
-        { ID: '1', Name: 'test-skill', Description: 'Test', Enabled: true, targets: [{ agent: 'claude', skill_id: '1', target_path: '', mode: 'symlink' }] },
-      ]),
+      list: vi.fn().mockResolvedValue([]),
     },
   },
 }))
@@ -33,13 +32,10 @@ describe('AgentWorkspace', () => {
     expect(screen.getByText('Not detected')).toBeInTheDocument()
   })
 
-  it('shows project and global dirs', async () => {
+  it('shows global dir', async () => {
     renderWithRouter(<AgentWorkspace />)
-    expect(await screen.findByText('.claude/skills')).toBeInTheDocument()
-  })
-
-  it('shows synced skill count', async () => {
-    renderWithRouter(<AgentWorkspace />)
-    expect(await screen.findByText('1 skills synced')).toBeInTheDocument()
+    await screen.findByText('Claude Code')
+    const codeEls = screen.getAllByText((_, el) => el?.tagName === 'CODE' && (el?.textContent?.includes('.claude/skills') ?? false))
+    expect(codeEls.length).toBeGreaterThan(0)
   })
 })

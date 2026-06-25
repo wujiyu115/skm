@@ -25,6 +25,12 @@ type ProjectSkill struct {
 // given project directory. For example ".claude/skills" becomes
 // ".claude/skills-disabled".
 func disabledDir(projectDir string) string {
+	return DisabledDirFor(projectDir)
+}
+
+// DisabledDirFor returns the disabled-skills directory path for a given
+// agent project directory. Exported for use by other packages.
+func DisabledDirFor(projectDir string) string {
 	return filepath.Join(filepath.Dir(projectDir), filepath.Base(projectDir)+"-disabled")
 }
 

@@ -116,8 +116,6 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"error": "no skills found"})
 	}
 
-	targetAgents := agent.Resolve(req.Agents)
-	cwd, _ := os.Getwd()
 	var installed []string
 
 	for _, sk := range skills {
@@ -142,19 +140,6 @@ func (s *Server) installSkill(c *fiber.Ctx) error {
 			return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("save skill %s: %v", sk.Name, err)})
 		}
 
-		for _, ag := range targetAgents {
-			targetDir, err := agent.InstallPath(ag, req.Global, cwd)
-			if err != nil {
-				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("install path: %v", err)})
-			}
-			targetPath := filepath.Join(targetDir, sk.Name)
-			if err := skmsync.SyncSkill(centralPath, targetPath, "symlink"); err != nil {
-				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("sync %s: %v", sk.Name, err)})
-			}
-			if err := s.store.UpsertTarget(sk.ID, ag.Name, targetPath, "symlink", hash); err != nil {
-				return c.Status(500).JSON(fiber.Map{"error": fmt.Sprintf("upsert target: %v", err)})
-			}
-		}
 		installed = append(installed, sk.Name)
 	}
 

@@ -114,6 +114,13 @@ export const api = {
   },
   agents: {
     list: () => request<Agent[]>('/agents').then(r => r ?? []),
+    skills: (name: string) => request<ProjectSkill[]>('/agents/' + name + '/skills').then(r => r ?? []),
+    addSkill: (name: string, skillId: string) =>
+      request('/agents/' + name + '/skills/add', { method: 'POST', body: JSON.stringify({ skill_id: skillId }) }),
+    toggleSkill: (name: string, skillName: string, enabled: boolean) =>
+      request('/agents/' + name + '/skills/toggle', { method: 'PUT', body: JSON.stringify({ skill_name: skillName, enabled }) }),
+    removeSkill: (name: string, skillPath: string) =>
+      request('/agents/' + name + '/skills', { method: 'DELETE', body: JSON.stringify({ skill_path: skillPath }) }),
   },
   projects: {
     list: () => request<Project[]>('/projects').then(r => r ?? []),

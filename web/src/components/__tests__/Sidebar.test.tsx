@@ -66,11 +66,11 @@ describe('Sidebar', () => {
     expect(twos.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('renders agents section', async () => {
+  it('renders agents section with only detected agents', async () => {
     renderWithRouter(<Sidebar />)
     expect(screen.getByText('Global Workspace')).toBeInTheDocument()
     expect(await screen.findByText('Claude Code')).toBeInTheDocument()
-    expect(await screen.findByText('Cursor')).toBeInTheDocument()
+    expect(screen.queryByText('Cursor')).not.toBeInTheDocument()
   })
 
   it('collapses presets section on click', async () => {
@@ -82,7 +82,8 @@ describe('Sidebar', () => {
 
   it('collapses agents section on click', async () => {
     renderWithRouter(<Sidebar />)
-    await screen.findByText('Claude Code')
+    const claude = await screen.findByText('Claude Code')
+    expect(claude).toBeInTheDocument()
     await userEvent.click(screen.getByText('Global Workspace'))
     expect(screen.queryByText('Claude Code')).not.toBeInTheDocument()
   })
