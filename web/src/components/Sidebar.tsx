@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, BookOpen, Download, Settings, ClipboardList,
-  ChevronDown, ChevronRight, FolderOpen, Globe, Terminal, Code, MousePointer, Sparkles, Languages,
-  Sun, Moon, Briefcase,
+  LayoutDashboard, BookOpen, Download, Settings,
+  ChevronDown, ChevronRight, FolderOpen, Globe, Terminal, Code, MousePointer, Sparkles,
+  Briefcase,
 } from 'lucide-react'
 import { api, type Group, type Agent, type Skill, type Project } from '../lib/api'
 import { useI18n } from '../lib/i18n'
-import { useTheme } from '../lib/theme'
 
 const agentIcons: Record<string, typeof Terminal> = {
   claude: Terminal,
@@ -17,8 +16,7 @@ const agentIcons: Record<string, typeof Terminal> = {
 
 export default function Sidebar() {
   const location = useLocation()
-  const { t, locale, setLocale } = useI18n()
-  const { theme, toggle: toggleTheme } = useTheme()
+  const { t, locale } = useI18n()
   const [groups, setGroups] = useState<Group[]>([])
   const [agents, setAgents] = useState<Agent[]>([])
   const [skills, setSkills] = useState<Skill[]>([])
@@ -209,32 +207,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <div className="p-3 border-t border-slate-200 dark:border-slate-700 space-y-1">
-        <button
-          onClick={toggleTheme}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full hover:bg-slate-100 dark:hover:bg-sidebar-hover transition-colors"
-        >
-          {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-          {theme === 'light' ? (locale === 'zh' ? '深色模式' : 'Dark Mode') : (locale === 'zh' ? '浅色模式' : 'Light Mode')}
-        </button>
-        <button
-          onClick={() => setLocale(locale === 'en' ? 'zh' : 'en')}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm w-full hover:bg-slate-100 dark:hover:bg-sidebar-hover transition-colors"
-        >
-          <Languages className="w-4 h-4" />
-          {locale === 'en' ? '中文' : 'English'}
-        </button>
-        <Link
-          to="/audit"
-          className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-            isActive('/audit')
-              ? 'bg-primary-600 text-white font-medium'
-              : 'hover:bg-slate-100 dark:hover:bg-sidebar-hover'
-          }`}
-        >
-          <ClipboardList className="w-4 h-4" />
-          {t('nav.audit')}
-        </Link>
+      <div className="p-3 border-t border-slate-200 dark:border-slate-700">
         <Link
           to="/settings"
           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${

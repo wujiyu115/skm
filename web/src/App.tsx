@@ -7,7 +7,7 @@ import Install from './pages/Install'
 import Groups from './pages/Groups'
 import AgentWorkspace from './pages/AgentWorkspace'
 import Settings from './pages/Settings'
-import AuditLog from './pages/AuditLog'
+
 import ProjectWorkspace from './pages/ProjectWorkspace'
 
 export default function App() {
@@ -26,7 +26,7 @@ export default function App() {
           <Route path="/projects/:id" element={<ProjectWorkspace />} />
           <Route path="/agents" element={<AgentWorkspace />} />
           <Route path="/agents/:name" element={<AgentWorkspace />} />
-          <Route path="/audit" element={<AuditLog />} />
+
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>
